@@ -1,48 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/mock_feed_items.dart';
-import '../video/feed_video_controller.dart';
+import '../../application/feed_providers.dart';
 import '../widgets/feed_page.dart';
 
-class FeedScreen extends StatefulWidget {
+class FeedScreen extends ConsumerWidget {
   const FeedScreen({
     required this.topOverlayHeight,
     required this.bottomNavigationHeight,
     required this.isActive,
-    this.feedVideoControllerFactory,
     super.key,
   });
 
   final double topOverlayHeight;
   final double bottomNavigationHeight;
   final bool isActive;
-  final FeedVideoControllerFactory? feedVideoControllerFactory;
 
   @override
-  State<FeedScreen> createState() => _FeedScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(feedItemsProvider);
+    final currentPage = ref.watch(currentFeedIndexProvider);
+    final isLoadingMore = ref.watch(isFeedLoadingMoreProvider);
+    final paginationError = ref.watch(feedPaginationErrorProvider);
 
-class _FeedScreenState extends State<FeedScreen> {
-  int _currentPage = 0;
-
-  @override
-  Widget build(BuildContext context) {
     return PageView.builder(
       scrollDirection: Axis.vertical,
-      itemCount: mockFeedItems.length,
+      itemCount: items.length,
       onPageChanged: (index) {
-        setState(() {
-          _currentPage = index;
-        });
+        ref.read(feedNotifierProvider.notifier).updateCurrentIndex(index);
       },
       itemBuilder: (context, index) {
+        final item = items[index];
+
         return FeedPage(
-          key: ValueKey(mockFeedItems[index].videoUrl),
-          item: mockFeedItems[index],
-          topOverlayHeight: widget.topOverlayHeight,
-          bottomNavigationHeight: widget.bottomNavigationHeight,
-          isActive: widget.isActive && _currentPage == index,
-          feedVideoControllerFactory: widget.feedVideoControllerFactory,
+          key: ValueKey(item.id),
+          item: item,
+          topOverlayHeight: topOverlayHeight,
+          bottomNavigationHeight: bottomNavigationHeight,
+          isActive: isActive && currentPage == index,
+          isLoadingMore: isLoadingMore && index == items.length - 1,
+          paginationError: paginationError,
         );
       },
     );

@@ -2,18 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../application/feed_providers.dart';
 import '../../domain/feed_item.dart';
 import '../video/feed_video_controller.dart';
-import '../video/video_player_feed_video_controller.dart';
 
-class FeedPage extends StatefulWidget {
+class FeedPage extends ConsumerStatefulWidget {
   const FeedPage({
     required this.item,
     required this.topOverlayHeight,
     required this.bottomNavigationHeight,
     required this.isActive,
-    this.feedVideoControllerFactory,
+    this.isLoadingMore = false,
+    this.paginationError,
     super.key,
   });
 
@@ -21,31 +23,28 @@ class FeedPage extends StatefulWidget {
   final double topOverlayHeight;
   final double bottomNavigationHeight;
   final bool isActive;
-  final FeedVideoControllerFactory? feedVideoControllerFactory;
+  final bool isLoadingMore;
+  final String? paginationError;
 
   static const pageBackground = Color(0xFF070707);
   static const likeColor = Color(0xFFFF2D55);
 
   @override
-  State<FeedPage> createState() => _FeedPageState();
+  ConsumerState<FeedPage> createState() => _FeedPageState();
 }
 
-class _FeedPageState extends State<FeedPage> {
+class _FeedPageState extends ConsumerState<FeedPage> {
   late final FeedVideoController _videoController;
   bool _isManuallyPaused = false;
-  bool _isLiked = false;
   bool _showLikeToast = false;
   bool _showBurstHeart = false;
   Timer? _likeOverlayTimer;
 
-  FeedVideoControllerFactory get _resolvedControllerFactory =>
-      widget.feedVideoControllerFactory ?? VideoPlayerFeedVideoController.new;
-
   @override
   void initState() {
     super.initState();
-    _isLiked = widget.item.isLiked;
-    _videoController = _resolvedControllerFactory(widget.item.videoUrl);
+    final controllerFactory = ref.read(feedVideoControllerFactoryProvider);
+    _videoController = controllerFactory(widget.item.videoUrl);
     unawaited(_initializeAndSync());
   }
 
@@ -112,10 +111,11 @@ class _FeedPageState extends State<FeedPage> {
     _likeOverlayTimer?.cancel();
 
     setState(() {
-      _isLiked = true;
-      _showLikeToast = true;
       _showBurstHeart = true;
+      _showLikeToast = !widget.item.isLiked;
     });
+
+    ref.read(feedNotifierProvider.notifier).like(widget.item.id);
 
     _likeOverlayTimer = Timer(const Duration(milliseconds: 900), () {
       if (!mounted) {
@@ -204,10 +204,37 @@ class _FeedPageState extends State<FeedPage> {
               ),
             if (_showBurstHeart) const Center(child: _BurstHeart()),
             if (_isManuallyPaused) const Center(child: _PausedBadge()),
+            if (widget.isLoadingMore)
+              Positioned(
+                right: 14,
+                bottom: widget.bottomNavigationHeight + 18,
+                child: const _FeedPaginationBadge(
+                  icon: Icons.downloading_rounded,
+                  label: 'Loading more',
+                ),
+              ),
+            if (widget.paginationError != null && widget.isActive)
+              Positioned(
+                left: 14,
+                right: 92,
+                bottom: widget.bottomNavigationHeight + 26,
+                child: _FeedPaginationBadge(
+                  icon: Icons.wifi_tethering_error_rounded,
+                  label: widget.paginationError!,
+                  tone: const Color(0xD9411218),
+                ),
+              ),
             Positioned(
               right: 12,
               bottom: widget.bottomNavigationHeight + 52,
-              child: _ActionRail(item: widget.item, isLiked: _isLiked),
+              child: _ActionRail(
+                item: widget.item,
+                onLikeTap: () {
+                  ref
+                      .read(feedNotifierProvider.notifier)
+                      .toggleLike(widget.item.id);
+                },
+              ),
             ),
             Positioned(
               left: 14,
@@ -498,6 +525,52 @@ class _LikeToast extends StatelessWidget {
   }
 }
 
+class _FeedPaginationBadge extends StatelessWidget {
+  const _FeedPaginationBadge({
+    required this.icon,
+    required this.label,
+    this.tone = const Color(0xD9101010),
+  });
+
+  final IconData icon;
+  final String label;
+  final Color tone;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: tone,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0x29FFFFFF)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: Colors.white, size: 14),
+            const SizedBox(width: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 180),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _BurstHeart extends StatelessWidget {
   const _BurstHeart();
 
@@ -534,10 +607,10 @@ class _PausedBadge extends StatelessWidget {
 }
 
 class _ActionRail extends StatelessWidget {
-  const _ActionRail({required this.item, required this.isLiked});
+  const _ActionRail({required this.item, required this.onLikeTap});
 
   final FeedItem item;
-  final bool isLiked;
+  final VoidCallback onLikeTap;
 
   @override
   Widget build(BuildContext context) {
@@ -551,25 +624,29 @@ class _ActionRail extends StatelessWidget {
           _ActionButton(
             icon: Icons.favorite,
             count: item.likeCount,
-            color: isLiked ? FeedPage.likeColor : Colors.white,
+            color: item.isLiked ? FeedPage.likeColor : Colors.white,
+            onTap: onLikeTap,
           ),
           const SizedBox(height: 14),
           _ActionButton(
             icon: CupertinoIcons.chat_bubble_fill,
             count: item.commentCount,
             color: Colors.white,
+            onTap: () {},
           ),
           const SizedBox(height: 14),
           _ActionButton(
             icon: Icons.bookmark,
             count: item.bookmarkCount,
             color: Colors.white,
+            onTap: () {},
           ),
           const SizedBox(height: 14),
           _ActionButton(
             icon: CupertinoIcons.arrowshape_turn_up_right_fill,
             count: item.shareCount,
             color: Colors.white,
+            onTap: () {},
           ),
           const SizedBox(height: 16),
           const _MusicDisc(),
@@ -630,30 +707,58 @@ class _ActionButton extends StatelessWidget {
     required this.icon,
     required this.count,
     required this.color,
+    required this.onTap,
   });
 
   final IconData icon;
-  final String count;
+  final int count;
   final Color color;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 32),
-        const SizedBox(height: 4),
-        Text(
-          count,
-          style: const TextStyle(
-            color: Color(0xF0FFFFFF),
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 4),
+          Text(
+            _formatSocialCount(count),
+            style: const TextStyle(
+              color: Color(0xF0FFFFFF),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
+}
+
+String _formatSocialCount(int count) {
+  if (count >= 1000000) {
+    final value = count / 1000000;
+    return '${_trimCompactDecimals(value)}M';
+  }
+
+  if (count >= 1000) {
+    final value = count / 1000;
+    return '${_trimCompactDecimals(value)}K';
+  }
+
+  return '$count';
+}
+
+String _trimCompactDecimals(double value) {
+  final decimals = value >= 100 ? 0 : 1;
+  final formatted = value.toStringAsFixed(decimals);
+  return formatted.endsWith('.0')
+      ? formatted.substring(0, formatted.length - 2)
+      : formatted;
 }
 
 class _MusicDisc extends StatelessWidget {
