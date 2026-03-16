@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TikTok Clone Feed Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+    <style>
+      :root {
+        --bg: #070707;
+        --board-bg: radial-gradient(circle at 10% 0%, #302233 0%, #151216 34%, #070707 100%);
+        --line: rgba(255, 255, 255, 0.1);
+        --text: #ffffff;
+        --muted: rgba(255, 255, 255, 0.76);
+        --soft: rgba(255, 255, 255, 0.58);
+        --pink: #ff2d55;
+        --cyan: #2de2ff;
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.48);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--board-bg);
+        color: var(--text);
+        font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      }
+
+      .canvas {
+        width: min(1560px, calc(100vw - 56px));
+        margin: 0 auto;
+        padding: 52px 0 80px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 32px;
+        margin-bottom: 34px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--pink), #ff7a00);
+        box-shadow: 0 0 18px rgba(255, 45, 85, 0.7);
+      }
+
+      h1 {
+        margin: 18px 0 14px;
+        font-size: clamp(42px, 5.4vw, 80px);
+        line-height: 0.94;
+        letter-spacing: -0.06em;
+      }
+
+      .header-copy {
+        max-width: 760px;
+      }
+
+      .header-copy p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.7;
+      }
+
+      .header-meta {
+        width: 330px;
+        padding: 22px;
+        border-radius: 26px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: var(--shadow);
+      }
+
+      .meta-title {
+        margin: 0 0 14px;
+        color: var(--soft);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .meta-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .meta-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        font-size: 14px;
+      }
+
+      .meta-row strong {
+        font-weight: 700;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(300px, 1fr));
+        gap: 28px;
+      }
+
+      .card {
+        display: grid;
+        gap: 14px;
+      }
+
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .card-head strong {
+        font-size: 20px;
+        letter-spacing: -0.04em;
+      }
+
+      .card-head span {
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.07);
+        color: var(--soft);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .phone {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 390 / 844;
+        border-radius: 34px;
+        background: var(--bg);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: var(--shadow);
+      }
+
+      .phone::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+        pointer-events: none;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.04) 22%, rgba(0, 0, 0, 0.6) 100%),
+          radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.18), transparent 14%),
+          linear-gradient(180deg, #4b6942 0%, #304831 26%, #223220 48%, #131313 100%);
+      }
+
+      .scene::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(90deg, transparent 0 14%, rgba(255, 255, 255, 0.06) 14.2% 14.8%, transparent 15% 82%, rgba(255, 255, 255, 0.06) 82.2% 82.8%, transparent 83%),
+          linear-gradient(180deg, transparent 0 72%, rgba(255, 255, 255, 0.07) 72.3% 72.8%, transparent 73%);
+        opacity: 0.9;
+      }
+
+      .scene::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 128px;
+        width: 44%;
+        height: 54%;
+        transform: translateX(-50%);
+        border-radius: 150px 150px 44px 44px;
+        background:
+          radial-gradient(circle at 50% 15%, #ffd6b6 0 10%, transparent 10.4%),
+          radial-gradient(circle at 50% 17%, rgba(47, 35, 29, 0.64) 0 16%, transparent 16.4%),
+          radial-gradient(circle at 50% 19%, #232425 0 27%, transparent 27.4%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 16%),
+          linear-gradient(180deg, #f2f2f2 0%, #dfdfdf 40%, #cacaca 64%, #1a1a1a 64.4%, #101010 100%);
+        filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.36));
+      }
+
+      .scene.alt {
+        filter: saturate(0.74) blur(1px);
+      }
+
+      .scene.liked {
+        background:
+          linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.04) 22%, rgba(0, 0, 0, 0.56) 100%),
+          radial-gradient(circle at 50% 16%, rgba(255, 190, 220, 0.22), transparent 14%),
+          linear-gradient(180deg, #4a6b55 0%, #314735 26%, #202e23 48%, #111111 100%);
+      }
+
+      .top-fade {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 176px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0));
+        z-index: 1;
+      }
+
+      .bottom-fade {
+        position: absolute;
+        inset: auto 0 0;
+        height: 280px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.72));
+        z-index: 1;
+      }
+
+      .status-bar {
+        position: absolute;
+        top: 14px;
+        left: 18px;
+        right: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 3;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .time-pill {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #e43b4e;
+        letter-spacing: 0.01em;
+      }
+
+      .status-icons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #fff;
+      }
+
+      .status-icons svg {
+        display: block;
+      }
+
+      .tabs {
+        position: absolute;
+        top: 54px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 18px;
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.72);
+        z-index: 3;
+      }
+
+      .tabs .active {
+        position: relative;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .tabs .active::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -8px;
+        width: 24px;
+        height: 2.5px;
+        border-radius: 999px;
+        background: #fff;
+      }
+
+      .search-button {
+        position: absolute;
+        top: 52px;
+        right: 18px;
+        z-index: 3;
+        color: #fff;
+      }
+
+      .action-rail {
+        position: absolute;
+        right: 12px;
+        bottom: 114px;
+        display: grid;
+        justify-items: center;
+        gap: 14px;
+        z-index: 3;
+      }
+
+      .profile-rail {
+        position: relative;
+        width: 50px;
+        display: grid;
+        justify-items: center;
+      }
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.92);
+        background:
+          radial-gradient(circle at 50% 38%, #ffd3af 0 22%, #8a5c47 22.5%, #271715 44%, #121214 64%, #090909 100%);
+      }
+
+      .badge-plus {
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 22px;
+        height: 22px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--pink);
+        border: 2px solid #070707;
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .rail-item {
+        display: grid;
+        justify-items: center;
+        gap: 4px;
+      }
+
+      .rail-item svg {
+        display: block;
+        width: 32px;
+        height: 32px;
+      }
+
+      .rail-item.like {
+        color: var(--pink);
+      }
+
+      .rail-item.fill-white {
+        color: #fff;
+      }
+
+      .rail-count {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.94);
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.32);
+      }
+
+      .disc {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at center, #0a0a0a 0 16%, #4e4e4e 16.5%, #121212 26%, #333 42%, #101010 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.32);
+      }
+
+      .meta {
+        position: absolute;
+        left: 14px;
+        right: 92px;
+        bottom: 82px;
+        z-index: 3;
+        display: grid;
+        gap: 8px;
+      }
+
+      .meta .label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .meta .label svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+      }
+
+      .meta h3 {
+        margin: 0;
+        font-size: 23px;
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+      }
+
+      .meta p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .meta .origin {
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .bottom-nav {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 52px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        align-items: center;
+        padding: 6px 0 2px;
+        background: rgba(0, 0, 0, 0.76);
+        z-index: 4;
+      }
+
+      .nav-item {
+        display: grid;
+        justify-items: center;
+        gap: 3px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .nav-item.active {
+        color: #fff;
+      }
+
+      .nav-item svg {
+        width: 24px;
+        height: 24px;
+        display: block;
+      }
+
+      .create-slot {
+        display: grid;
+        place-items: center;
+      }
+
+      .create-button {
+        position: relative;
+        width: 40px;
+        height: 26px;
+        border-radius: 9px;
+        background: #fff;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+        z-index: 1;
+      }
+
+      .create-button::before,
+      .create-button::after {
+        content: '';
+        position: absolute;
+        top: 1px;
+        bottom: 1px;
+        width: 13px;
+        border-radius: 9px;
+        z-index: -1;
+      }
+
+      .create-button::before {
+        left: -5px;
+        background: var(--cyan);
+      }
+
+      .create-button::after {
+        right: -5px;
+        background: var(--pink);
+      }
+
+      .create-plus {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: #161616;
+        font-size: 20px;
+        font-weight: 400;
+        z-index: 1;
+      }
+
+      .buffer-flag,
+      .liked-flag {
+        position: absolute;
+        left: 14px;
+        top: 102px;
+        z-index: 4;
+        height: 30px;
+        padding: 0 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .buffer-flag {
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+      }
+
+      .liked-flag {
+        background: rgba(255, 45, 85, 0.18);
+        border: 1px solid rgba(255, 45, 85, 0.28);
+        color: #ffd8e2;
+      }
+
+      .buffer-layer {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.16);
+        display: grid;
+        place-items: center;
+        z-index: 4;
+      }
+
+      .spinner {
+        width: 66px;
+        height: 66px;
+        border-radius: 50%;
+        border: 4px solid rgba(255, 255, 255, 0.16);
+        border-top-color: rgba(255, 255, 255, 0.92);
+      }
+
+      .heart-burst {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        z-index: 4;
+      }
+
+      .heart-burst svg {
+        width: 112px;
+        height: 112px;
+        color: #ff4a72;
+        filter: drop-shadow(0 18px 28px rgba(255, 45, 85, 0.36));
+      }
+
+      .notes {
+        grid-column: 1 / -1;
+        margin-top: 18px;
+        padding: 28px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: var(--shadow);
+      }
+
+      .notes-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        margin-bottom: 20px;
+      }
+
+      .notes-head h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.04em;
+      }
+
+      .notes-head p {
+        margin: 10px 0 0;
+        max-width: 720px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.65;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .note {
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .note strong {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 15px;
+        letter-spacing: -0.02em;
+      }
+
+      .note p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.62;
+        color: var(--muted);
+      }
+
+      @media (max-width: 1280px) {
+        .canvas {
+          width: min(1280px, calc(100vw - 36px));
+        }
+
+        .grid {
+          grid-template-columns: repeat(2, minmax(300px, 1fr));
+        }
+
+        .notes-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 860px) {
+        .canvas {
+          width: calc(100vw - 20px);
+          padding-top: 28px;
+        }
+
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .header-meta {
+          width: 100%;
+        }
+
+        .grid,
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute; opacity: 0; pointer-events: none;">
+      <symbol id="i-signal" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M3 18h2v3H3zm4-3h2v6H7zm4-4h2v10h-2zm4-4h2v14h-2zm4-3h2v17h-2z"></path>
+      </symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 18.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.4-2.6a5.2 5.2 0 0 1 6.8 0l-1.2 1.4a3.4 3.4 0 0 0-4.4 0Zm-3.1-3.4a9.7 9.7 0 0 1 13 0l-1.2 1.4a7.9 7.9 0 0 0-10.6 0Zm-3-3.5a14.3 14.3 0 0 1 19 0L20.3 10a12.5 12.5 0 0 0-16.6 0Z"></path>
+      </symbol>
+      <symbol id="i-battery" viewBox="0 0 28 14">
+        <rect x="1" y="1" width="22" height="12" rx="3" stroke="currentColor" stroke-width="1.5" fill="none"></rect>
+        <rect x="3.4" y="3.4" width="16" height="7.2" rx="1.5" fill="currentColor"></rect>
+        <rect x="24.4" y="4.1" width="2.6" height="5.8" rx="1.2" fill="currentColor"></rect>
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="5.7" stroke="currentColor" stroke-width="2" fill="none"></circle>
+        <path d="m15 15 4.3 4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </symbol>
+      <symbol id="i-heart" viewBox="0 0 32 32">
+        <path fill="currentColor" d="M16 28.8c-.4 0-.8-.1-1.1-.4C8 22.8 4 18.9 4 13.5 4 9.3 7.1 6 11 6c2.1 0 4.2 1 5.6 2.7C18 7 20.1 6 22.2 6 26 6 29 9.3 29 13.5c0 5.4-4 9.3-10.9 14.9-.3.3-.7.4-1.3.4Z"></path>
+      </symbol>
+      <symbol id="i-comment" viewBox="0 0 32 32">
+        <path fill="currentColor" d="M16 5C8.8 5 3 9.8 3 15.8c0 3.2 1.7 6.1 4.6 8.1l-.8 5.1 5.4-2.7c1.2.3 2.5.5 3.8.5 7.2 0 13-4.8 13-10.8S23.2 5 16 5Z"></path>
+      </symbol>
+      <symbol id="i-bookmark" viewBox="0 0 32 32">
+        <path fill="currentColor" d="M9 4h14a2 2 0 0 1 2 2v22l-9-4.8L7 28V6a2 2 0 0 1 2-2Z"></path>
+      </symbol>
+      <symbol id="i-share" viewBox="0 0 32 32">
+        <path fill="currentColor" d="M27.4 13.7 18.2 5a1.2 1.2 0 0 0-2 .9v4.4c-7.2.5-11.3 4.2-13.2 11.2a1.2 1.2 0 0 0 2 1.2c3.2-3.5 6.4-4.8 11.2-4.9v4.3a1.2 1.2 0 0 0 2 .9l9.2-8.6a1.1 1.1 0 0 0 0-1.7Z"></path>
+      </symbol>
+      <symbol id="i-home" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 4.5 3.5 11v9.5h6.2v-5.8h4.6v5.8h6.2V11z"></path>
+      </symbol>
+      <symbol id="i-friends" viewBox="0 0 24 24">
+        <path d="M8 12a3.2 3.2 0 1 0 0-6.4A3.2 3.2 0 0 0 8 12Zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.7 18.8c.4-2.5 2.4-4.3 5.1-4.3h1.3c2.7 0 4.7 1.8 5.1 4.3M13.7 18.8c.3-1.8 1.8-3.2 3.7-3.2h1c1.9 0 3.3 1.4 3.6 3.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      </symbol>
+      <symbol id="i-inbox" viewBox="0 0 24 24">
+        <path d="M4 7.2A2.2 2.2 0 0 1 6.2 5h11.6A2.2 2.2 0 0 1 20 7.2v9.6a2.2 2.2 0 0 1-2.2 2.2H6.2A2.2 2.2 0 0 1 4 16.8Zm0 6.1h4.2l1.3 2h5l1.3-2H20" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"></path>
+      </symbol>
+      <symbol id="i-profile" viewBox="0 0 24 24">
+        <circle cx="12" cy="8.3" r="3.4" stroke="currentColor" stroke-width="1.8" fill="none"></circle>
+        <path d="M5.4 19c.8-3.1 3.4-5 6.6-5s5.8 1.9 6.6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"></path>
+      </symbol>
+      <symbol id="i-verified" viewBox="0 0 24 24">
+        <path fill="#2DA8FF" d="M12 2.7 15 4l3.3-.2 1.3 3 2.7 2-.7 3.2.7 3.3-2.7 2-1.3 3L15 20l-3 1.3L9 20l-3.3.2-1.3-3-2.7-2 .7-3.3-.7-3.2 2.7-2 1.3-3L9 4Z"></path>
+        <path d="m8.2 12.3 2.4 2.4 5-5.3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      </symbol>
+    </svg>
+    <script>
+      (() => {
+        const resolveSvgUses = () => {
+          document.querySelectorAll('svg use[href^="#"]').forEach((use) => {
+            const href = use.getAttribute('href');
+            const symbol = href ? document.querySelector(href) : null;
+            const svg = use.closest('svg');
+
+            if (!symbol || !svg) {
+              return;
+            }
+
+            if (!svg.getAttribute('viewBox') && symbol.getAttribute('viewBox')) {
+              svg.setAttribute('viewBox', symbol.getAttribute('viewBox'));
+            }
+
+            Array.from(symbol.childNodes).forEach((node) => {
+              svg.insertBefore(node.cloneNode(true), use);
+            });
+
+            use.remove();
+          });
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', resolveSvgUses, { once: true });
+        } else {
+          resolveSvgUses();
+        }
+      })();
+    </script>
+
+    <main class="canvas">
+      <section class="header">
+        <div class="header-copy">
+          <div class="eyebrow">Video-verified direction</div>
+          <h1>Updated feed design<br />closer to the real recording</h1>
+          <p>
+            Rebuilt from the provided TikTok screen recording. The feed now reflects the actual
+            hierarchy more closely: top tabs with search, a visible bottom navigation bar, and a
+            right action rail built from standalone SVG glyphs instead of glass buttons.
+          </p>
+        </div>
+        <aside class="header-meta">
+          <p class="meta-title">Corrections applied</p>
+          <div class="meta-list">
+            <div class="meta-row"><span>Top chrome</span><strong>Status bar, tabs, search</strong></div>
+            <div class="meta-row"><span>Right rail</span><strong>SVG icons, no circular wrappers</strong></div>
+            <div class="meta-row"><span>Bottom area</span><strong>Real feed tab bar restored</strong></div>
+            <div class="meta-row"><span>Heart</span><strong>Filled TikTok-like shape</strong></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <div class="card-head">
+            <strong>Feed / Default</strong>
+            <span>recording-aligned</span>
+          </div>
+          <div class="phone">
+            <div class="scene"></div>
+            <div class="top-fade"></div>
+            <div class="bottom-fade"></div>
+
+            <div class="status-bar">
+              <div class="time-pill">14:00</div>
+              <div class="status-icons">
+                <svg viewBox="0 0 24 24"><use href="#i-signal"></use></svg>
+                <svg viewBox="0 0 24 24"><use href="#i-wifi"></use></svg>
+                <svg viewBox="0 0 28 14"><use href="#i-battery"></use></svg>
+              </div>
+            </div>
+
+            <div class="tabs">
+              <span>Explore</span>
+              <span>Following</span>
+              <span class="active">For You</span>
+            </div>
+
+            <div class="search-button">
+              <svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-search"></use></svg>
+            </div>
+
+            <div class="action-rail">
+              <div class="profile-rail">
+                <div class="avatar"></div>
+                <div class="badge-plus">+</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-heart"></use></svg>
+                <div class="rail-count">626.6K</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-comment"></use></svg>
+                <div class="rail-count">3,152</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-bookmark"></use></svg>
+                <div class="rail-count">22.8K</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-share"></use></svg>
+                <div class="rail-count">13.4K</div>
+              </div>
+
+              <div class="disc"></div>
+            </div>
+
+            <div class="meta">
+              <div class="label">UEFA Champions League</div>
+              <h3>Champions League <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align: -2px;"><use href="#i-verified"></use></svg></h3>
+              <p>Faith Valverde. #UCL<br />#RealMadridvsManchesterCity</p>
+              <div class="origin">See original</div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item active">
+                <svg viewBox="0 0 24 24"><use href="#i-home"></use></svg>
+                <span>Home</span>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-friends"></use></svg>
+                <span>Friends</span>
+              </div>
+              <div class="create-slot">
+                <div class="create-button"><div class="create-plus">+</div></div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-inbox"></use></svg>
+                <span>Inbox</span>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-profile"></use></svg>
+                <span>Profile</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <strong>Feed / Buffering</strong>
+            <span>state overlay</span>
+          </div>
+          <div class="phone">
+            <div class="scene alt"></div>
+            <div class="top-fade"></div>
+            <div class="bottom-fade"></div>
+
+            <div class="status-bar">
+              <div class="time-pill">14:00</div>
+              <div class="status-icons">
+                <svg viewBox="0 0 24 24"><use href="#i-signal"></use></svg>
+                <svg viewBox="0 0 24 24"><use href="#i-wifi"></use></svg>
+                <svg viewBox="0 0 28 14"><use href="#i-battery"></use></svg>
+              </div>
+            </div>
+
+            <div class="buffer-flag">BUFFERING</div>
+            <div class="buffer-layer"><div class="spinner"></div></div>
+
+            <div class="action-rail">
+              <div class="profile-rail">
+                <div class="avatar"></div>
+                <div class="badge-plus">+</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-heart"></use></svg>
+                <div class="rail-count">626.6K</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-comment"></use></svg>
+                <div class="rail-count">3,152</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-bookmark"></use></svg>
+                <div class="rail-count">22.8K</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-share"></use></svg>
+                <div class="rail-count">13.4K</div>
+              </div>
+
+              <div class="disc"></div>
+            </div>
+
+            <div class="meta">
+              <div class="label">UEFA Champions League</div>
+              <h3>Champions League</h3>
+              <p>Overlay stays mounted while the scene dims and the loader appears in the center.</p>
+              <div class="origin">Layout does not jump during buffering</div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item active">
+                <svg viewBox="0 0 24 24"><use href="#i-home"></use></svg>
+                <span>Home</span>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-friends"></use></svg>
+                <span>Friends</span>
+              </div>
+              <div class="create-slot">
+                <div class="create-button"><div class="create-plus">+</div></div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-inbox"></use></svg>
+                <span>Inbox</span>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-profile"></use></svg>
+                <span>Profile</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <strong>Feed / Liked</strong>
+            <span>double tap feedback</span>
+          </div>
+          <div class="phone">
+            <div class="scene liked"></div>
+            <div class="top-fade"></div>
+            <div class="bottom-fade"></div>
+
+            <div class="status-bar">
+              <div class="time-pill">14:00</div>
+              <div class="status-icons">
+                <svg viewBox="0 0 24 24"><use href="#i-signal"></use></svg>
+                <svg viewBox="0 0 24 24"><use href="#i-wifi"></use></svg>
+                <svg viewBox="0 0 28 14"><use href="#i-battery"></use></svg>
+              </div>
+            </div>
+
+            <div class="tabs">
+              <span>Explore</span>
+              <span>Following</span>
+              <span class="active">For You</span>
+            </div>
+
+            <div class="search-button">
+              <svg viewBox="0 0 24 24" width="22" height="22"><use href="#i-search"></use></svg>
+            </div>
+
+            <div class="liked-flag">
+              <svg viewBox="0 0 32 32" width="14" height="14"><use href="#i-heart"></use></svg>
+              Liked on double tap
+            </div>
+
+            <div class="heart-burst">
+              <svg viewBox="0 0 32 32"><use href="#i-heart"></use></svg>
+            </div>
+
+            <div class="action-rail">
+              <div class="profile-rail">
+                <div class="avatar"></div>
+                <div class="badge-plus">+</div>
+              </div>
+
+              <div class="rail-item like">
+                <svg viewBox="0 0 32 32"><use href="#i-heart"></use></svg>
+                <div class="rail-count">629.1K</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-comment"></use></svg>
+                <div class="rail-count">3,208</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-bookmark"></use></svg>
+                <div class="rail-count">23.1K</div>
+              </div>
+
+              <div class="rail-item fill-white">
+                <svg viewBox="0 0 32 32"><use href="#i-share"></use></svg>
+                <div class="rail-count">13.7K</div>
+              </div>
+
+              <div class="disc"></div>
+            </div>
+
+            <div class="meta">
+              <div class="label">Motion test</div>
+              <h3>Like feedback state</h3>
+              <p>Filled heart icon stays pink and the larger central heart scales in during the double tap animation.</p>
+              <div class="origin">Single layout, different interaction state</div>
+            </div>
+
+            <div class="bottom-nav">
+              <div class="nav-item active">
+                <svg viewBox="0 0 24 24"><use href="#i-home"></use></svg>
+                <span>Home</span>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-friends"></use></svg>
+                <span>Friends</span>
+              </div>
+              <div class="create-slot">
+                <div class="create-button"><div class="create-plus">+</div></div>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-inbox"></use></svg>
+                <span>Inbox</span>
+              </div>
+              <div class="nav-item">
+                <svg viewBox="0 0 24 24"><use href="#i-profile"></use></svg>
+                <span>Profile</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <section class="notes">
+          <div class="notes-head">
+            <div>
+              <h2>Updated Interaction Notes</h2>
+              <p>
+                The main correction is structural fidelity. The overlay now behaves like the recording:
+                dense top chrome, visible bottom navigation, right-edge action glyphs, and compact text
+                placement above the bottom bar. Icons are vector shapes so the same assets can move into Flutter.
+              </p>
+            </div>
+            <div class="eyebrow">Implementation Ready</div>
+          </div>
+
+          <div class="notes-grid">
+            <div class="note">
+              <strong>Action Rail</strong>
+              <p>Avatar, like, comment, bookmark, share, and rotating disc stack vertically near the right edge with no circular glass wrappers.</p>
+            </div>
+            <div class="note">
+              <strong>Top Chrome</strong>
+              <p>Keep the native status bar visible and reserve space for centered tabs and the top-right search icon.</p>
+            </div>
+            <div class="note">
+              <strong>Bottom Layout</strong>
+              <p>Metadata sits above the bottom tab bar. The tab bar remains visible even while the feed is active.</p>
+            </div>
+            <div class="note">
+              <strong>State Layers</strong>
+              <p>Buffering and like feedback should be added as overlays on the same feed scaffold without shifting the base layout.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
