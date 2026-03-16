@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'features/feed/presentation/screens/feed_screen.dart';
+import 'features/app_shell/presentation/screens/app_shell.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -23,7 +23,7 @@ class App extends StatelessWidget {
           surface: Color(0xFF070707),
         ),
       ),
-      home: const FeedScreen(),
+      home: const AppShell(),
     );
   }
 }

@@ -4,19 +4,22 @@ import 'package:flutter/material.dart';
 import '../../domain/feed_item.dart';
 
 class FeedPage extends StatelessWidget {
-  const FeedPage({required this.item, super.key});
+  const FeedPage({
+    required this.item,
+    required this.topOverlayHeight,
+    required this.bottomNavigationHeight,
+    super.key,
+  });
 
   final FeedItem item;
+  final double topOverlayHeight;
+  final double bottomNavigationHeight;
 
   static const _pageBackground = Color(0xFF070707);
   static const _likeColor = Color(0xFFFF2D55);
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final topInset = mediaQuery.padding.top;
-    final bottomInset = mediaQuery.padding.bottom;
-
     return ColoredBox(
       color: _pageBackground,
       child: Stack(
@@ -25,30 +28,9 @@ class FeedPage extends StatelessWidget {
           _SceneBackground(item: item),
           const _TopFade(),
           const _BottomFade(),
-          Positioned(
-            top: topInset + 14,
-            left: 18,
-            right: 18,
-            child: const _StatusPillRow(),
-          ),
-          Positioned(
-            top: topInset + 54,
-            left: 0,
-            right: 0,
-            child: const _TopTabs(),
-          ),
-          Positioned(
-            top: topInset + 52,
-            right: 18,
-            child: const Icon(
-              CupertinoIcons.search,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
           if (item.showLikeToast)
             Positioned(
-              top: topInset + 102,
+              top: topOverlayHeight + 12,
               left: 14,
               child: const _LikeToast(),
             ),
@@ -66,20 +48,14 @@ class FeedPage extends StatelessWidget {
           if (item.showDoubleTapLike) const Center(child: _BurstHeart()),
           Positioned(
             right: 12,
-            bottom: bottomInset + 104,
+            bottom: bottomNavigationHeight + 52,
             child: _ActionRail(item: item),
           ),
           Positioned(
             left: 14,
             right: 92,
-            bottom: bottomInset + 78,
+            bottom: bottomNavigationHeight + 26,
             child: _FeedMetadata(item: item),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: _BottomNavigationBar(bottomInset: bottomInset),
           ),
         ],
       ),
@@ -290,66 +266,6 @@ class _BottomFade extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _StatusPillRow extends StatelessWidget {
-  const _StatusPillRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE43B4E),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: const Text(
-            '14:00',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-      ],
-    );
-  }
-}
-
-class _TopTabs extends StatelessWidget {
-  const _TopTabs();
-
-  @override
-  Widget build(BuildContext context) {
-    const inactiveStyle = TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w500,
-      color: Color(0xB8FFFFFF),
-    );
-    const activeStyle = TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w700,
-      color: Colors.white,
-    );
-
-    return Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Explore', style: inactiveStyle),
-          SizedBox(width: 18),
-          Text('Following', style: inactiveStyle),
-          SizedBox(width: 18),
-          Text('For You', style: activeStyle),
-        ],
       ),
     );
   }
@@ -628,140 +544,6 @@ class _FeedMetadata extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _BottomNavigationBar extends StatelessWidget {
-  const _BottomNavigationBar({required this.bottomInset});
-
-  final double bottomInset;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: bottomInset + 52,
-      padding: EdgeInsets.only(bottom: bottomInset),
-      color: const Color(0xC2000000),
-      child: const Row(
-        children: [
-          Expanded(
-            child: _BottomNavItem(
-              icon: CupertinoIcons.house_fill,
-              label: 'Home',
-              selected: true,
-            ),
-          ),
-          Expanded(
-            child: _BottomNavItem(
-              icon: CupertinoIcons.person_2,
-              label: 'Friends',
-            ),
-          ),
-          Expanded(child: Center(child: _CreateButton())),
-          Expanded(
-            child: _BottomNavItem(icon: CupertinoIcons.tray, label: 'Inbox'),
-          ),
-          Expanded(
-            child: _BottomNavItem(
-              icon: CupertinoIcons.person_crop_circle,
-              label: 'Profile',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomNavItem extends StatelessWidget {
-  const _BottomNavItem({
-    required this.icon,
-    required this.label,
-    this.selected = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected ? Colors.white : const Color(0xC7FFFFFF);
-
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CreateButton extends StatelessWidget {
-  const _CreateButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 52,
-      height: 32,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            left: 4,
-            child: Container(
-              width: 18,
-              height: 30,
-              decoration: BoxDecoration(
-                color: const Color(0xFF27D9F8),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 4,
-            child: Container(
-              width: 18,
-              height: 30,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF2D55),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-          Container(
-            width: 40,
-            height: 26,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(9),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x47000000),
-                  blurRadius: 10,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: const Center(
-              child: Icon(Icons.add, color: Color(0xFF161616), size: 20),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
