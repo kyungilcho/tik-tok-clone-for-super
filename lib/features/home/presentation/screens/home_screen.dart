@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../feed/presentation/screens/feed_screen.dart';
+import '../../../feed/presentation/video/feed_video_controller.dart';
 import '../../../shared/presentation/widgets/feature_placeholder.dart';
 
 enum HomeTab {
@@ -15,11 +16,18 @@ enum HomeTab {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({required this.bottomNavigationHeight, super.key});
+  const HomeScreen({
+    required this.bottomNavigationHeight,
+    required this.isActiveBranch,
+    this.feedVideoControllerFactory,
+    super.key,
+  });
 
   static const double chromeContentHeight = 88;
 
   final double bottomNavigationHeight;
+  final bool isActiveBranch;
+  final FeedVideoControllerFactory? feedVideoControllerFactory;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -58,6 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
               FeedScreen(
                 topOverlayHeight: topOverlayHeight,
                 bottomNavigationHeight: widget.bottomNavigationHeight,
+                isActive: widget.isActiveBranch && _currentTab == HomeTab.feed,
+                feedVideoControllerFactory: widget.feedVideoControllerFactory,
               ),
             ],
           ),

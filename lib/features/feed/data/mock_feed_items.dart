@@ -4,6 +4,8 @@ import '../domain/feed_item.dart';
 
 const mockFeedItems = <FeedItem>[
   FeedItem(
+    videoUrl:
+        'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     musicLabel: 'UEFA Champions League',
     title: 'Champions League',
     caption: 'Faith Valverde. #UCL',
@@ -21,6 +23,8 @@ const mockFeedItems = <FeedItem>[
     glowColor: Color(0x44FFFFFF),
   ),
   FeedItem(
+    videoUrl:
+        'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     musicLabel: 'UEFA Champions League',
     title: 'Champions League',
     caption:
@@ -37,9 +41,10 @@ const mockFeedItems = <FeedItem>[
       Color(0xFF070707),
     ],
     glowColor: Color(0x33E8F5E9),
-    showBuffering: true,
   ),
   FeedItem(
+    videoUrl:
+        'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
     musicLabel: 'Motion test',
     title: 'Like feedback state',
     caption:

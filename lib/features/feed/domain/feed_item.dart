@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 @immutable
 class FeedItem {
   const FeedItem({
+    required this.videoUrl,
     required this.musicLabel,
     required this.title,
     required this.caption,
@@ -19,6 +20,7 @@ class FeedItem {
     this.showLikeToast = false,
   });
 
+  final String videoUrl;
   final String musicLabel;
   final String title;
   final String caption;

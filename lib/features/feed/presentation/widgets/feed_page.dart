@@ -1,63 +1,222 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/feed_item.dart';
+import '../video/feed_video_controller.dart';
+import '../video/video_player_feed_video_controller.dart';
 
-class FeedPage extends StatelessWidget {
+class FeedPage extends StatefulWidget {
   const FeedPage({
     required this.item,
     required this.topOverlayHeight,
     required this.bottomNavigationHeight,
+    required this.isActive,
+    this.feedVideoControllerFactory,
     super.key,
   });
 
   final FeedItem item;
   final double topOverlayHeight;
   final double bottomNavigationHeight;
+  final bool isActive;
+  final FeedVideoControllerFactory? feedVideoControllerFactory;
 
-  static const _pageBackground = Color(0xFF070707);
-  static const _likeColor = Color(0xFFFF2D55);
+  static const pageBackground = Color(0xFF070707);
+  static const likeColor = Color(0xFFFF2D55);
+
+  @override
+  State<FeedPage> createState() => _FeedPageState();
+}
+
+class _FeedPageState extends State<FeedPage> {
+  late final FeedVideoController _videoController;
+  bool _isManuallyPaused = false;
+  bool _isLiked = false;
+  bool _showLikeToast = false;
+  bool _showBurstHeart = false;
+  Timer? _likeOverlayTimer;
+
+  FeedVideoControllerFactory get _resolvedControllerFactory =>
+      widget.feedVideoControllerFactory ?? VideoPlayerFeedVideoController.new;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLiked = widget.item.isLiked;
+    _videoController = _resolvedControllerFactory(widget.item.videoUrl);
+    unawaited(_initializeAndSync());
+  }
+
+  @override
+  void didUpdateWidget(covariant FeedPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isActive != widget.isActive) {
+      if (!widget.isActive) {
+        _isManuallyPaused = false;
+      }
+      unawaited(_syncPlayback());
+    }
+  }
+
+  @override
+  void dispose() {
+    _likeOverlayTimer?.cancel();
+    unawaited(_videoController.dispose());
+    super.dispose();
+  }
+
+  Future<void> _initializeAndSync() async {
+    try {
+      await _videoController.initialize();
+    } catch (_) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    await _syncPlayback();
+  }
+
+  Future<void> _syncPlayback() async {
+    try {
+      if (!widget.isActive || _isManuallyPaused) {
+        await _videoController.pause();
+        return;
+      }
+      await _videoController.play();
+    } catch (_) {
+      return;
+    }
+  }
+
+  Future<void> _togglePlayback() async {
+    if (!widget.isActive) {
+      return;
+    }
+
+    final state = _videoController.state.value;
+    if (!state.isInitialized || state.hasError) {
+      return;
+    }
+
+    setState(() {
+      _isManuallyPaused = !_isManuallyPaused;
+    });
+
+    await _syncPlayback();
+  }
+
+  void _handleDoubleTapLike() {
+    _likeOverlayTimer?.cancel();
+
+    setState(() {
+      _isLiked = true;
+      _showLikeToast = true;
+      _showBurstHeart = true;
+    });
+
+    _likeOverlayTimer = Timer(const Duration(milliseconds: 900), () {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _showLikeToast = false;
+        _showBurstHeart = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: _pageBackground,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _SceneBackground(item: item),
-          const _TopFade(),
-          const _BottomFade(),
-          if (item.showLikeToast)
-            Positioned(
-              top: topOverlayHeight + 12,
-              left: 14,
-              child: const _LikeToast(),
-            ),
-          if (item.showBuffering)
-            const Center(
-              child: SizedBox(
-                width: 56,
-                height: 56,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Color(0x66FFFFFF),
-                ),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _togglePlayback,
+      onDoubleTap: _handleDoubleTapLike,
+      child: ColoredBox(
+        color: FeedPage.pageBackground,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _SceneBackground(item: widget.item),
+            Positioned.fill(
+              child: ValueListenableBuilder<FeedVideoState>(
+                valueListenable: _videoController.state,
+                builder: (context, videoState, child) {
+                  if (videoState.hasError) {
+                    return const SizedBox.expand();
+                  }
+
+                  return AnimatedOpacity(
+                    duration: const Duration(milliseconds: 240),
+                    opacity: videoState.isInitialized ? 1 : 0,
+                    child: _videoController.buildView(),
+                  );
+                },
               ),
             ),
-          if (item.showDoubleTapLike) const Center(child: _BurstHeart()),
-          Positioned(
-            right: 12,
-            bottom: bottomNavigationHeight + 52,
-            child: _ActionRail(item: item),
-          ),
-          Positioned(
-            left: 14,
-            right: 92,
-            bottom: bottomNavigationHeight + 26,
-            child: _FeedMetadata(item: item),
-          ),
-        ],
+            const _TopFade(),
+            const _BottomFade(),
+            ValueListenableBuilder<FeedVideoState>(
+              valueListenable: _videoController.state,
+              builder: (context, videoState, child) {
+                final showLoader =
+                    widget.isActive &&
+                    !videoState.hasError &&
+                    (!videoState.isInitialized || videoState.isBuffering);
+
+                if (!showLoader) {
+                  return const SizedBox.shrink();
+                }
+
+                return const Center(
+                  child: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0x66FFFFFF),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ValueListenableBuilder<FeedVideoState>(
+              valueListenable: _videoController.state,
+              builder: (context, videoState, child) {
+                if (!videoState.hasError) {
+                  return const SizedBox.shrink();
+                }
+
+                return _ErrorBadge(
+                  topOffset: widget.topOverlayHeight + 12,
+                  message:
+                      videoState.errorDescription ?? 'Unable to load video',
+                );
+              },
+            ),
+            if (_showLikeToast)
+              Positioned(
+                top: widget.topOverlayHeight + 12,
+                left: 14,
+                child: const _LikeToast(),
+              ),
+            if (_showBurstHeart) const Center(child: _BurstHeart()),
+            if (_isManuallyPaused) const Center(child: _PausedBadge()),
+            Positioned(
+              right: 12,
+              bottom: widget.bottomNavigationHeight + 52,
+              child: _ActionRail(item: widget.item, isLiked: _isLiked),
+            ),
+            Positioned(
+              left: 14,
+              right: 92,
+              bottom: widget.bottomNavigationHeight + 26,
+              child: _FeedMetadata(item: widget.item),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -271,6 +430,42 @@ class _BottomFade extends StatelessWidget {
   }
 }
 
+class _ErrorBadge extends StatelessWidget {
+  const _ErrorBadge({required this.topOffset, required this.message});
+
+  final double topOffset;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: topOffset,
+      left: 14,
+      right: 14,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xA9161616),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0x29FFFFFF)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Text(
+            message,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LikeToast extends StatelessWidget {
   const _LikeToast();
 
@@ -319,10 +514,30 @@ class _BurstHeart extends StatelessWidget {
   }
 }
 
+class _PausedBadge extends StatelessWidget {
+  const _PausedBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xA6000000),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0x33FFFFFF)),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(18),
+        child: Icon(Icons.play_arrow_rounded, size: 42, color: Colors.white),
+      ),
+    );
+  }
+}
+
 class _ActionRail extends StatelessWidget {
-  const _ActionRail({required this.item});
+  const _ActionRail({required this.item, required this.isLiked});
 
   final FeedItem item;
+  final bool isLiked;
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +551,7 @@ class _ActionRail extends StatelessWidget {
           _ActionButton(
             icon: Icons.favorite,
             count: item.likeCount,
-            color: item.isLiked ? FeedPage._likeColor : Colors.white,
+            color: isLiked ? FeedPage.likeColor : Colors.white,
           ),
           const SizedBox(height: 14),
           _ActionButton(
