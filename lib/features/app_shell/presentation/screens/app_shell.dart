@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../feed/presentation/video/feed_video_controller.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import '../../../shared/presentation/widgets/feature_placeholder.dart';
 import '../widgets/app_shell_bottom_navigation_bar.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({this.feedVideoControllerFactory, super.key});
-
-  final FeedVideoControllerFactory? feedVideoControllerFactory;
+  const AppShell({super.key});
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -31,7 +28,6 @@ class _AppShellState extends State<AppShell> {
           HomeScreen(
             bottomNavigationHeight: bottomNavigationHeight,
             isActiveBranch: _currentBranch == AppShellBranch.home,
-            feedVideoControllerFactory: widget.feedVideoControllerFactory,
           ),
           FeaturePlaceholder(
             title: 'Friends',

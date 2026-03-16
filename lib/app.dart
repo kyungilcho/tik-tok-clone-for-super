@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'features/app_shell/presentation/screens/app_shell.dart';
-import 'features/feed/presentation/video/feed_video_controller.dart';
 
 class App extends StatelessWidget {
-  const App({this.feedVideoControllerFactory, super.key});
-
-  final FeedVideoControllerFactory? feedVideoControllerFactory;
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +23,7 @@ class App extends StatelessWidget {
           surface: Color(0xFF070707),
         ),
       ),
-      home: AppShell(feedVideoControllerFactory: feedVideoControllerFactory),
+      home: const AppShell(),
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tik_tok_clone_for_super/app.dart';
+import 'package:tik_tok_clone_for_super/features/feed/application/feed_providers.dart';
 import 'package:tik_tok_clone_for_super/features/feed/presentation/video/feed_video_controller.dart';
 
 class FakeFeedVideoController implements FeedVideoController {
@@ -45,7 +47,14 @@ void main() {
   testWidgets('renders app shell with home feed by default', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(App(feedVideoControllerFactory: fakeFactory));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          feedVideoControllerFactoryProvider.overrideWithValue(fakeFactory),
+        ],
+        child: const App(),
+      ),
+    );
     await tester.pump();
 
     expect(find.byType(PageView), findsOneWidget);
@@ -58,7 +67,14 @@ void main() {
   testWidgets('switches to placeholder branch from app shell', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(App(feedVideoControllerFactory: fakeFactory));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          feedVideoControllerFactoryProvider.overrideWithValue(fakeFactory),
+        ],
+        child: const App(),
+      ),
+    );
     await tester.pump();
 
     await tester.tap(find.text('Friends'));
