@@ -24,11 +24,15 @@ class VideoPlayerFeedVideoController implements FeedVideoController {
       return const SizedBox.expand();
     }
 
+    final aspectRatio = value.size.height == 0
+        ? 9 / 16
+        : value.size.width / value.size.height;
+
     return ClipRect(
       child: ColoredBox(
         color: Colors.black,
         child: FittedBox(
-          fit: BoxFit.cover,
+          fit: fitForShortFormAspectRatio(aspectRatio),
           child: SizedBox(
             width: value.size.width,
             height: value.size.height,

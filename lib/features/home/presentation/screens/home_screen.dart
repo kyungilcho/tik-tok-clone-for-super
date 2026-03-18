@@ -48,15 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               FeaturePlaceholder(
                 title: 'Explore',
-                description:
-                    'Explore tab placeholder. Discovery surfaces can be mounted here later.',
                 topPadding: topOverlayHeight,
                 bottomPadding: widget.bottomNavigationHeight,
               ),
               FeaturePlaceholder(
                 title: 'Following',
-                description:
-                    'Following tab placeholder. Follow graph feed can be mounted here later.',
                 topPadding: topOverlayHeight,
                 bottomPadding: widget.bottomNavigationHeight,
               ),
@@ -66,12 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 isActive: widget.isActiveBranch && _currentTab == HomeTab.feed,
               ),
             ],
-          ),
-          Positioned(
-            top: topInset + 14,
-            left: 18,
-            right: 18,
-            child: const _StatusPillRow(),
           ),
           Positioned(
             top: topInset + 54,
@@ -97,35 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _StatusPillRow extends StatelessWidget {
-  const _StatusPillRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFFE43B4E),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: const Text(
-            '14:00',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-      ],
     );
   }
 }

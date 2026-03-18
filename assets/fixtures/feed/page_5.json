@@ -1,0 +1,46 @@
+{
+  "page": 5,
+  "items": [
+    {
+      "id": "story-01",
+      "title": "Forest story",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "thumbnailUrl": "assets/posters/feed/story-01.jpg",
+        "durationMs": 24400,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-story-01",
+        "username": "cinema.cut",
+        "displayName": "Cinema Cut",
+        "avatarUrl": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-story-01",
+        "title": "Forest pulse",
+        "artist": "Cinematic",
+        "coverImageUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "One higher-bitrate clip was added at the end so network playback quality can be compared more clearly.",
+        "footnote": "High-quality network sample"
+      },
+      "metrics": {
+        "likeCount": 861400,
+        "commentCount": 5124,
+        "bookmarkCount": 38400,
+        "shareCount": 21100
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#4D6A5F", "#30443C", "#17211D", "#090A09"],
+        "glowColor": "#44D4FFD9"
+      }
+    }
+  ]
+}

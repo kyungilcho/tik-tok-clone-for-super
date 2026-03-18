@@ -38,3 +38,11 @@ typedef FeedVideoControllerFactory =
 FeedVideoState errorFeedVideoState(String message) {
   return FeedVideoState(hasError: true, errorDescription: message);
 }
+
+BoxFit fitForShortFormAspectRatio(double aspectRatio) {
+  if (aspectRatio >= 0.8) {
+    return BoxFit.contain;
+  }
+
+  return BoxFit.cover;
+}

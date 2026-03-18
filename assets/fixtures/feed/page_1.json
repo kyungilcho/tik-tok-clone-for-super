@@ -1,0 +1,128 @@
+{
+  "page": 1,
+  "items": [
+    {
+      "id": "ucl-01",
+      "title": "Champions League",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "thumbnailUrl": "assets/posters/feed/ucl-01.jpg",
+        "durationMs": 18400,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-ucl-01",
+        "username": "faith.valverde",
+        "displayName": "Faith Valverde",
+        "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-ucl-01",
+        "title": "UEFA Champions League",
+        "artist": "Official",
+        "coverImageUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Faith Valverde. #UCL",
+        "footnote": "#RealMadridvsManchesterCity  See original"
+      },
+      "metrics": {
+        "likeCount": 626600,
+        "commentCount": 3152,
+        "bookmarkCount": 22800,
+        "shareCount": 13400
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#4B6942", "#304831", "#223220", "#131313"],
+        "glowColor": "#44FFFFFF"
+      }
+    },
+    {
+      "id": "ucl-02",
+      "title": "Champions League",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "thumbnailUrl": "assets/posters/feed/ucl-02.jpg",
+        "durationMs": 17100,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-ucl-02",
+        "username": "championsleague",
+        "displayName": "Champions League",
+        "avatarUrl": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-ucl-02",
+        "title": "Overlay state",
+        "artist": "System",
+        "coverImageUrl": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Overlay stays mounted while the scene dims and the loader appears in the center.",
+        "footnote": "Layout holds on top during buffering"
+      },
+      "metrics": {
+        "likeCount": 626600,
+        "commentCount": 3152,
+        "bookmarkCount": 22800,
+        "shareCount": 13400
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#36582B", "#17301A", "#0C1711", "#070707"],
+        "glowColor": "#33E8F5E9"
+      }
+    },
+    {
+      "id": "motion-01",
+      "title": "Like feedback state",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+        "thumbnailUrl": "assets/posters/feed/motion-01.jpg",
+        "durationMs": 16300,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-motion-01",
+        "username": "motion.test",
+        "displayName": "Motion Test",
+        "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+        "isVerified": false
+      },
+      "track": {
+        "id": "track-motion-01",
+        "title": "Interaction pass",
+        "artist": "Prototype",
+        "coverImageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Filled heart icon stays pink and the larger central heart scales in during the double tap animation.",
+        "footnote": "Single layout, different interaction state"
+      },
+      "metrics": {
+        "likeCount": 629100,
+        "commentCount": 3208,
+        "bookmarkCount": 23100,
+        "shareCount": 13700
+      },
+      "interaction": {
+        "isLiked": true,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#4A6B55", "#314735", "#202E23", "#111111"],
+        "glowColor": "#40FFC6D8"
+      }
+    }
+  ]
+}

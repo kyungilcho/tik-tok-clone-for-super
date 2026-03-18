@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../application/feed_providers.dart';
 import '../../domain/feed_item.dart';
+import '../../../shared/presentation/widgets/muted_tiktok_logo.dart';
 import '../video/feed_video_controller.dart';
 
 class FeedPage extends ConsumerStatefulWidget {
@@ -28,6 +30,9 @@ class FeedPage extends ConsumerStatefulWidget {
 
   static const pageBackground = Color(0xFF070707);
   static const likeColor = Color(0xFFFF2D55);
+  static const overlayIconShadows = [
+    Shadow(color: Color(0xCC000000), blurRadius: 14, offset: Offset.zero),
+  ];
 
   @override
   ConsumerState<FeedPage> createState() => _FeedPageState();
@@ -36,9 +41,11 @@ class FeedPage extends ConsumerStatefulWidget {
 class _FeedPageState extends ConsumerState<FeedPage> {
   late final FeedVideoController _videoController;
   bool _isManuallyPaused = false;
-  bool _showLikeToast = false;
+  bool _showDebugBuffering = false;
   bool _showBurstHeart = false;
+  Offset? _doubleTapPosition;
   Timer? _likeOverlayTimer;
+  Timer? _debugBufferingTimer;
 
   @override
   void initState() {
@@ -54,6 +61,8 @@ class _FeedPageState extends ConsumerState<FeedPage> {
     if (oldWidget.isActive != widget.isActive) {
       if (!widget.isActive) {
         _isManuallyPaused = false;
+        _showDebugBuffering = false;
+        _debugBufferingTimer?.cancel();
       }
       unawaited(_syncPlayback());
     }
@@ -62,6 +71,7 @@ class _FeedPageState extends ConsumerState<FeedPage> {
   @override
   void dispose() {
     _likeOverlayTimer?.cancel();
+    _debugBufferingTimer?.cancel();
     unawaited(_videoController.dispose());
     super.dispose();
   }
@@ -107,12 +117,15 @@ class _FeedPageState extends ConsumerState<FeedPage> {
     await _syncPlayback();
   }
 
+  void _handleDoubleTapDown(TapDownDetails details) {
+    _doubleTapPosition = details.localPosition;
+  }
+
   void _handleDoubleTapLike() {
     _likeOverlayTimer?.cancel();
 
     setState(() {
       _showBurstHeart = true;
-      _showLikeToast = !widget.item.isLiked;
     });
 
     ref.read(feedNotifierProvider.notifier).like(widget.item.id);
@@ -122,18 +135,48 @@ class _FeedPageState extends ConsumerState<FeedPage> {
         return;
       }
       setState(() {
-        _showLikeToast = false;
         _showBurstHeart = false;
+      });
+    });
+  }
+
+  void _simulateDebugBuffering() {
+    if (!kDebugMode || !widget.isActive) {
+      return;
+    }
+
+    _debugBufferingTimer?.cancel();
+    setState(() {
+      _showDebugBuffering = true;
+    });
+
+    _debugBufferingTimer = Timer(const Duration(milliseconds: 1800), () {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _showDebugBuffering = false;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final burstHeartHalfSize = _BurstHeart.size / 2;
+    final burstHeartLeft =
+        ((_doubleTapPosition?.dx ?? screenSize.width / 2) - burstHeartHalfSize)
+            .clamp(16.0, screenSize.width - _BurstHeart.size - 16.0);
+    final burstHeartTop =
+        ((_doubleTapPosition?.dy ?? screenSize.height / 2) - burstHeartHalfSize)
+            .clamp(16.0, screenSize.height - _BurstHeart.size - 16.0);
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _togglePlayback,
+      onDoubleTapDown: _handleDoubleTapDown,
       onDoubleTap: _handleDoubleTapLike,
+      onLongPress: kDebugMode ? _simulateDebugBuffering : null,
       child: ColoredBox(
         color: FeedPage.pageBackground,
         child: Stack(
@@ -164,7 +207,7 @@ class _FeedPageState extends ConsumerState<FeedPage> {
                 final showLoader =
                     widget.isActive &&
                     !videoState.hasError &&
-                    (!videoState.isInitialized || videoState.isBuffering);
+                    !videoState.isInitialized;
 
                 if (!showLoader) {
                   return const SizedBox.shrink();
@@ -185,6 +228,27 @@ class _FeedPageState extends ConsumerState<FeedPage> {
             ValueListenableBuilder<FeedVideoState>(
               valueListenable: _videoController.state,
               builder: (context, videoState, child) {
+                final showBufferingIndicator =
+                    widget.isActive &&
+                    !videoState.hasError &&
+                    ((videoState.isInitialized && videoState.isBuffering) ||
+                        _showDebugBuffering);
+
+                if (!showBufferingIndicator) {
+                  return const SizedBox.shrink();
+                }
+
+                return Positioned(
+                  left: 14,
+                  right: 14,
+                  bottom: widget.bottomNavigationHeight + 4,
+                  child: const _BufferingPulseBar(),
+                );
+              },
+            ),
+            ValueListenableBuilder<FeedVideoState>(
+              valueListenable: _videoController.state,
+              builder: (context, videoState, child) {
                 if (!videoState.hasError) {
                   return const SizedBox.shrink();
                 }
@@ -196,13 +260,12 @@ class _FeedPageState extends ConsumerState<FeedPage> {
                 );
               },
             ),
-            if (_showLikeToast)
+            if (_showBurstHeart)
               Positioned(
-                top: widget.topOverlayHeight + 12,
-                left: 14,
-                child: const _LikeToast(),
+                left: burstHeartLeft,
+                top: burstHeartTop,
+                child: const IgnorePointer(child: _BurstHeart()),
               ),
-            if (_showBurstHeart) const Center(child: _BurstHeart()),
             if (_isManuallyPaused) const Center(child: _PausedBadge()),
             if (widget.isLoadingMore)
               Positioned(
@@ -259,45 +322,20 @@ class _SceneBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: item.sceneColors,
+        const DecoratedBox(
+          decoration: BoxDecoration(color: FeedPage.pageBackground),
+        ),
+        const Center(child: IgnorePointer(child: MutedTikTokLogo(size: 176))),
+        if (item.videoThumbnailUrl.isNotEmpty)
+          Positioned.fill(
+            child: _PosterImage(
+              source: item.videoThumbnailUrl,
+              aspectRatio: item.videoAspectRatio,
             ),
           ),
-        ),
-        Positioned(
-          top: 96,
-          left: 0,
-          right: 0,
-          child: IgnorePointer(
-            child: Center(
-              child: Container(
-                width: 184,
-                height: 184,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [item.glowColor, Colors.transparent],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Align(
-          alignment: const Alignment(0, 0.2),
-          child: IgnorePointer(
-            child: SizedBox(
-              width: 220,
-              height: 520,
-              child: Stack(
-                alignment: Alignment.topCenter,
-                children: const [_FigureShadow(), _FigureBody(), _FigureHead()],
-              ),
-            ),
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(color: Color(0x26000000)),
           ),
         ),
       ],
@@ -305,104 +343,45 @@ class _SceneBackground extends StatelessWidget {
   }
 }
 
-class _FigureShadow extends StatelessWidget {
-  const _FigureShadow();
+class _PosterImage extends StatelessWidget {
+  const _PosterImage({required this.source, required this.aspectRatio});
+
+  final String source;
+  final double aspectRatio;
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 32,
-      child: Container(
-        width: 212,
-        height: 160,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x59000000),
-              blurRadius: 44,
-              spreadRadius: 6,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+    Widget frameBuilder(
+      BuildContext context,
+      Widget child,
+      int? frame,
+      bool wasSynchronouslyLoaded,
+    ) {
+      return AnimatedOpacity(
+        duration: const Duration(milliseconds: 220),
+        opacity: wasSynchronouslyLoaded || frame != null ? 1 : 0,
+        child: child,
+      );
+    }
 
-class _FigureBody extends StatelessWidget {
-  const _FigureBody();
+    if (source.startsWith('assets/')) {
+      return Image.asset(
+        source,
+        fit: fitForShortFormAspectRatio(aspectRatio),
+        frameBuilder: frameBuilder,
+        errorBuilder: (context, error, stackTrace) {
+          return const SizedBox.shrink();
+        },
+      );
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: 66,
-      child: Container(
-        width: 194,
-        height: 420,
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(120),
-            topRight: Radius.circular(120),
-            bottomLeft: Radius.circular(38),
-            bottomRight: Radius.circular(38),
-          ),
-          gradient: const LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF2F2F2),
-              Color(0xFFD7D7D7),
-              Color(0xFFBCBCBC),
-              Color(0xFF171717),
-              Color(0xFF0F0F0F),
-            ],
-            stops: [0, 0.4, 0.62, 0.621, 1],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FigureHead extends StatelessWidget {
-  const _FigureHead();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 120,
-      height: 140,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          Positioned(
-            top: 8,
-            child: Container(
-              width: 88,
-              height: 88,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [Color(0xFF232425), Color(0xFF111112)],
-                  stops: [0.32, 1],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            child: Container(
-              width: 52,
-              height: 52,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFFFFD6B6),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return Image.network(
+      source,
+      fit: fitForShortFormAspectRatio(aspectRatio),
+      frameBuilder: frameBuilder,
+      errorBuilder: (context, error, stackTrace) {
+        return const SizedBox.shrink();
+      },
     );
   }
 }
@@ -493,38 +472,6 @@ class _ErrorBadge extends StatelessWidget {
   }
 }
 
-class _LikeToast extends StatelessWidget {
-  const _LikeToast();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 30,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: const Color(0x2EFF2D55),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0x47FF2D55)),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.favorite, color: Color(0xFFFFD8E2), size: 14),
-          SizedBox(width: 8),
-          Text(
-            'Liked on double tap',
-            style: TextStyle(
-              color: Color(0xFFFFD8E2),
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _FeedPaginationBadge extends StatelessWidget {
   const _FeedPaginationBadge({
     required this.icon,
@@ -574,6 +521,8 @@ class _FeedPaginationBadge extends StatelessWidget {
 class _BurstHeart extends StatelessWidget {
   const _BurstHeart();
 
+  static const double size = 112;
+
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
@@ -582,7 +531,7 @@ class _BurstHeart extends StatelessWidget {
           BoxShadow(color: Color(0x55FF2D55), blurRadius: 26, spreadRadius: 2),
         ],
       ),
-      child: const Icon(Icons.favorite, size: 112, color: Color(0xFFFF4B73)),
+      child: const Icon(Icons.favorite, size: size, color: Color(0xFFFF4B73)),
     );
   }
 }
@@ -592,15 +541,90 @@ class _PausedBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xA6000000),
-        shape: BoxShape.circle,
-        border: Border.all(color: const Color(0x33FFFFFF)),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(18),
-        child: Icon(Icons.play_arrow_rounded, size: 42, color: Colors.white),
+    return const Icon(
+      Icons.play_arrow_rounded,
+      size: 78,
+      color: Colors.white,
+      shadows: FeedPage.overlayIconShadows,
+    );
+  }
+}
+
+class _BufferingPulseBar extends StatefulWidget {
+  const _BufferingPulseBar();
+
+  @override
+  State<_BufferingPulseBar> createState() => _BufferingPulseBarState();
+}
+
+class _BufferingPulseBarState extends State<_BufferingPulseBar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1280),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 3,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: DecoratedBox(
+          decoration: const BoxDecoration(color: Color(0x22FFFFFF)),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  final moveT = Curves.easeInOut.transform(_controller.value);
+                  final pulseT =
+                      1 -
+                      ((_controller.value - 0.5).abs() / 0.5).clamp(0.0, 1.0);
+                  final segmentWidth =
+                      36 + ((84 - 36) * pulseT).clamp(0.0, 84.0);
+                  final left =
+                      (constraints.maxWidth - segmentWidth).clamp(
+                        0.0,
+                        constraints.maxWidth,
+                      ) *
+                      moveT;
+
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Positioned(
+                        left: left,
+                        width: segmentWidth,
+                        top: 0,
+                        bottom: 0,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(999),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x99FFFFFF),
+                                blurRadius: 10,
+                                spreadRadius: 0.4,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -619,7 +643,7 @@ class _ActionRail extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const _AvatarAction(),
+          _AvatarAction(item: item),
           const SizedBox(height: 12),
           _ActionButton(
             icon: Icons.favorite,
@@ -649,7 +673,7 @@ class _ActionRail extends StatelessWidget {
             onTap: () {},
           ),
           const SizedBox(height: 16),
-          const _MusicDisc(),
+          _MusicDisc(item: item),
         ],
       ),
     );
@@ -657,7 +681,9 @@ class _ActionRail extends StatelessWidget {
 }
 
 class _AvatarAction extends StatelessWidget {
-  const _AvatarAction();
+  const _AvatarAction({required this.item});
+
+  final FeedItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -673,13 +699,41 @@ class _AvatarAction extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xEBFFFFFF), width: 2),
-              gradient: const RadialGradient(
-                colors: [
-                  Color(0xFFFFD3AF),
-                  Color(0xFF8A5C47),
-                  Color(0xFF090909),
-                ],
-                stops: [0.22, 0.55, 1],
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0xAA000000),
+                  blurRadius: 14,
+                  offset: Offset.zero,
+                ),
+              ],
+            ),
+            child: ClipOval(
+              child: Image.network(
+                item.authorAvatarUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: item.sceneColors.take(3).toList(),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        item.authorDisplayName.isEmpty
+                            ? '?'
+                            : item.authorDisplayName
+                                  .substring(0, 1)
+                                  .toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -693,7 +747,12 @@ class _AvatarAction extends StatelessWidget {
                 borderRadius: BorderRadius.circular(11),
                 border: Border.all(color: const Color(0xFF070707), width: 2),
               ),
-              child: const Icon(Icons.add, color: Colors.white, size: 14),
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 14,
+                shadows: FeedPage.overlayIconShadows,
+              ),
             ),
           ),
         ],
@@ -723,7 +782,12 @@ class _ActionButton extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 32),
+          Icon(
+            icon,
+            color: color,
+            size: 32,
+            shadows: FeedPage.overlayIconShadows,
+          ),
           const SizedBox(height: 4),
           Text(
             _formatSocialCount(count),
@@ -731,6 +795,7 @@ class _ActionButton extends StatelessWidget {
               color: Color(0xF0FFFFFF),
               fontSize: 12,
               fontWeight: FontWeight.w600,
+              shadows: FeedPage.overlayIconShadows,
             ),
           ),
         ],
@@ -762,7 +827,9 @@ String _trimCompactDecimals(double value) {
 }
 
 class _MusicDisc extends StatelessWidget {
-  const _MusicDisc();
+  const _MusicDisc({required this.item});
+
+  final FeedItem item;
 
   @override
   Widget build(BuildContext context) {
@@ -779,17 +846,43 @@ class _MusicDisc extends StatelessWidget {
           BoxShadow(
             color: Color(0x52000000),
             blurRadius: 18,
-            offset: Offset(0, 10),
+            offset: Offset.zero,
           ),
         ],
       ),
       child: Center(
-        child: Container(
-          width: 16,
-          height: 16,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: const Color(0x22000000), width: 3),
+        child: ClipOval(
+          child: SizedBox(
+            width: 28,
+            height: 28,
+            child: Image.network(
+              item.trackCoverImageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        item.glowColor.withValues(alpha: 0.75),
+                        const Color(0xFF101010),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: const Color(0x22000000),
+                      width: 3,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0xAA000000),
+                        blurRadius: 14,
+                        offset: Offset.zero,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -809,7 +902,7 @@ class _FeedMetadata extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          item.musicLabel,
+          item.originalTrackLabel,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
@@ -833,16 +926,18 @@ class _FeedMetadata extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 6),
-            Container(
-              width: 14,
-              height: 14,
-              decoration: const BoxDecoration(
-                color: Color(0xFF209CFF),
-                shape: BoxShape.circle,
+            if (item.authorIsVerified) ...[
+              const SizedBox(width: 6),
+              Container(
+                width: 14,
+                height: 14,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF209CFF),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 10),
               ),
-              child: const Icon(Icons.check, color: Colors.white, size: 10),
-            ),
+            ],
           ],
         ),
         const SizedBox(height: 8),

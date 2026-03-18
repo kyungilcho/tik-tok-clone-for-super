@@ -1,0 +1,128 @@
+{
+  "page": 2,
+  "items": [
+    {
+      "id": "city-01",
+      "title": "Neon street run",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "thumbnailUrl": "assets/posters/feed/city-01.jpg",
+        "durationMs": 14600,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-city-01",
+        "username": "night.drive",
+        "displayName": "Night Drive",
+        "avatarUrl": "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-city-01",
+        "title": "Midnight drive",
+        "artist": "After Hours",
+        "coverImageUrl": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Second page starts only when you reach the end of the first mock set.",
+        "footnote": "Mock pagination page 2"
+      },
+      "metrics": {
+        "likeCount": 418500,
+        "commentCount": 1870,
+        "bookmarkCount": 12900,
+        "shareCount": 7600
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#3D3C73", "#2A2953", "#171833", "#09090D"],
+        "glowColor": "#4489A8FF"
+      }
+    },
+    {
+      "id": "food-01",
+      "title": "One-pan dinner",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+        "thumbnailUrl": "assets/posters/feed/food-01.jpg",
+        "durationMs": 19800,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-food-01",
+        "username": "home.kitchen",
+        "displayName": "Home Kitchen",
+        "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=256&q=80",
+        "isVerified": false
+      },
+      "track": {
+        "id": "track-food-01",
+        "title": "Kitchen test",
+        "artist": "Weeknight",
+        "coverImageUrl": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Different metadata and counts make the load-more step feel like a real new batch.",
+        "footnote": "Fresh set, not a clone of page 1"
+      },
+      "metrics": {
+        "likeCount": 289400,
+        "commentCount": 942,
+        "bookmarkCount": 18200,
+        "shareCount": 5100
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": true
+      },
+      "visual": {
+        "sceneColors": ["#7C5036", "#55351F", "#25160E", "#0D0A08"],
+        "glowColor": "#44FFB36B"
+      }
+    },
+    {
+      "id": "travel-01",
+      "title": "Road to the ridge",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+        "thumbnailUrl": "assets/posters/feed/travel-01.jpg",
+        "durationMs": 20500,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-travel-01",
+        "username": "weekend.escape",
+        "displayName": "Weekend Escape",
+        "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-travel-01",
+        "title": "Weekend escape",
+        "artist": "Open Road",
+        "coverImageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "This batch uses a different sample video source so the feed does not feel looped.",
+        "footnote": "Mock pagination page 2"
+      },
+      "metrics": {
+        "likeCount": 507800,
+        "commentCount": 2214,
+        "bookmarkCount": 30400,
+        "shareCount": 11800
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#586C67", "#334440", "#1B2321", "#090A0A"],
+        "glowColor": "#447BE7D5"
+      }
+    }
+  ]
+}

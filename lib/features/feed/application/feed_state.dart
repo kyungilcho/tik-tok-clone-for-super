@@ -7,6 +7,7 @@ class FeedState {
   const FeedState({
     required this.items,
     required this.currentIndex,
+    required this.isInitialLoading,
     required this.isLoadingMore,
     required this.hasNextPage,
     required this.nextPage,
@@ -15,6 +16,7 @@ class FeedState {
 
   final List<FeedItem> items;
   final int currentIndex;
+  final bool isInitialLoading;
   final bool isLoadingMore;
   final bool hasNextPage;
   final int nextPage;
@@ -25,6 +27,7 @@ class FeedState {
   FeedState copyWith({
     List<FeedItem>? items,
     int? currentIndex,
+    bool? isInitialLoading,
     bool? isLoadingMore,
     bool? hasNextPage,
     int? nextPage,
@@ -33,6 +36,7 @@ class FeedState {
     return FeedState(
       items: items ?? this.items,
       currentIndex: currentIndex ?? this.currentIndex,
+      isInitialLoading: isInitialLoading ?? this.isInitialLoading,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       hasNextPage: hasNextPage ?? this.hasNextPage,
       nextPage: nextPage ?? this.nextPage,

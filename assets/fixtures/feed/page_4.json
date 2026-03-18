@@ -1,0 +1,128 @@
+{
+  "page": 4,
+  "items": [
+    {
+      "id": "garage-01",
+      "title": "Garage spotlight",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+        "thumbnailUrl": "assets/posters/feed/garage-01.jpg",
+        "durationMs": 22600,
+        "aspectRatio": 2.3443
+      },
+      "author": {
+        "id": "author-garage-01",
+        "username": "garage.notes",
+        "displayName": "Garage Notes",
+        "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80",
+        "isVerified": false
+      },
+      "track": {
+        "id": "track-garage-01",
+        "title": "Cold start",
+        "artist": "Workshop",
+        "coverImageUrl": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Fourth batch keeps pagination believable instead of stopping at nine items.",
+        "footnote": "Mock pagination page 4"
+      },
+      "metrics": {
+        "likeCount": 241300,
+        "commentCount": 1188,
+        "bookmarkCount": 8600,
+        "shareCount": 4200
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#6A5B50", "#44382E", "#231B15", "#090807"],
+        "glowColor": "#44FFD1A3"
+      }
+    },
+    {
+      "id": "road-01",
+      "title": "Road trip cut",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+        "thumbnailUrl": "assets/posters/feed/road-01.jpg",
+        "durationMs": 21900,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-road-01",
+        "username": "open.road.club",
+        "displayName": "Open Road Club",
+        "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-road-01",
+        "title": "Rolling fast",
+        "artist": "Engine Room",
+        "coverImageUrl": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "A wider driving clip gives the feed a different rhythm after the vertical-first batches.",
+        "footnote": "Mock pagination page 4"
+      },
+      "metrics": {
+        "likeCount": 483900,
+        "commentCount": 2056,
+        "bookmarkCount": 19200,
+        "shareCount": 9700
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#4C5F7A", "#2D3A4B", "#171E28", "#090B0E"],
+        "glowColor": "#449CC6FF"
+      }
+    },
+    {
+      "id": "budget-01",
+      "title": "Budget build",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/GoogleIO-2014-CastingToTheFuture.mp4",
+        "thumbnailUrl": "assets/posters/feed/budget-01.jpg",
+        "durationMs": 20800,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-budget-01",
+        "username": "budget.garage",
+        "displayName": "Budget Garage",
+        "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=256&q=80",
+        "isVerified": false
+      },
+      "track": {
+        "id": "track-budget-01",
+        "title": "One grand challenge",
+        "artist": "Build Notes",
+        "coverImageUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "The repository now stretches to twelve items, with a final page that still feels distinct.",
+        "footnote": "Mock pagination page 4"
+      },
+      "metrics": {
+        "likeCount": 318700,
+        "commentCount": 1442,
+        "bookmarkCount": 11100,
+        "shareCount": 5900
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": true
+      },
+      "visual": {
+        "sceneColors": ["#6A644A", "#433F2D", "#211F16", "#090907"],
+        "glowColor": "#44FFE08C"
+      }
+    }
+  ]
+}

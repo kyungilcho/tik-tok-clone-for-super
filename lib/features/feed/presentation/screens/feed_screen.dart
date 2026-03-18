@@ -20,8 +20,36 @@ class FeedScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final items = ref.watch(feedItemsProvider);
     final currentPage = ref.watch(currentFeedIndexProvider);
+    final isInitialLoading = ref.watch(isFeedInitialLoadingProvider);
     final isLoadingMore = ref.watch(isFeedLoadingMoreProvider);
     final paginationError = ref.watch(feedPaginationErrorProvider);
+
+    if (items.isEmpty && isInitialLoading) {
+      return const Center(
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+        ),
+      );
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Text(
+            paginationError ?? 'Unable to load feed fixtures.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
 
     return PageView.builder(
       scrollDirection: Axis.vertical,

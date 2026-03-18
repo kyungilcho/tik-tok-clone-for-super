@@ -24,6 +24,12 @@ final currentFeedIndexProvider = Provider<int>((ref) {
   return ref.watch(feedNotifierProvider.select((state) => state.currentIndex));
 });
 
+final isFeedInitialLoadingProvider = Provider<bool>((ref) {
+  return ref.watch(
+    feedNotifierProvider.select((state) => state.isInitialLoading),
+  );
+});
+
 final isFeedLoadingMoreProvider = Provider<bool>((ref) {
   return ref.watch(feedNotifierProvider.select((state) => state.isLoadingMore));
 });

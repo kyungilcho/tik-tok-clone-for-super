@@ -14,17 +14,22 @@ class FeedNotifier extends Notifier<FeedState> {
 
   @override
   FeedState build() {
-    return FeedState(
-      items: _repository.getInitialFeedItems(),
+    final initialState = FeedState(
+      items: const [],
       currentIndex: 0,
+      isInitialLoading: true,
       isLoadingMore: false,
-      hasNextPage: true,
+      hasNextPage: false,
       nextPage: 1,
     );
+
+    unawaited(_loadInitialItems());
+
+    return initialState;
   }
 
   void updateCurrentIndex(int index) {
-    if (index == state.currentIndex) {
+    if (state.items.isEmpty || index == state.currentIndex) {
       return;
     }
 
@@ -33,7 +38,7 @@ class FeedNotifier extends Notifier<FeedState> {
   }
 
   Future<void> loadMoreIfNeeded() async {
-    if (state.isLoadingMore || !state.hasNextPage) {
+    if (state.isInitialLoading || state.isLoadingMore || !state.hasNextPage) {
       return;
     }
 
@@ -67,6 +72,24 @@ class FeedNotifier extends Notifier<FeedState> {
     } catch (error) {
       state = state.copyWith(
         isLoadingMore: false,
+        errorMessage: error.toString(),
+      );
+    }
+  }
+
+  Future<void> _loadInitialItems() async {
+    try {
+      final items = await _repository.getInitialFeedItems();
+      state = state.copyWith(
+        items: items,
+        isInitialLoading: false,
+        hasNextPage: items.isNotEmpty,
+        errorMessage: null,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        isInitialLoading: false,
+        hasNextPage: false,
         errorMessage: error.toString(),
       );
     }

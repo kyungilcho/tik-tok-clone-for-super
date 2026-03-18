@@ -1,0 +1,128 @@
+{
+  "page": 3,
+  "items": [
+    {
+      "id": "sport-01",
+      "title": "Last mock batch",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "thumbnailUrl": "assets/posters/feed/sport-01.jpg",
+        "durationMs": 23200,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-sport-01",
+        "username": "final.wave",
+        "displayName": "Final Wave",
+        "avatarUrl": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-sport-01",
+        "title": "Final wave",
+        "artist": "Prototype",
+        "coverImageUrl": "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Third page proves pagination can continue without repeating the first three cards.",
+        "footnote": "Mock pagination page 3"
+      },
+      "metrics": {
+        "likeCount": 712300,
+        "commentCount": 4012,
+        "bookmarkCount": 26400,
+        "shareCount": 16600
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#605B8C", "#3A365C", "#201D32", "#0D0C16"],
+        "glowColor": "#44D8C8FF"
+      }
+    },
+    {
+      "id": "style-01",
+      "title": "Fabric motion",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        "thumbnailUrl": "assets/posters/feed/style-01.jpg",
+        "durationMs": 21400,
+        "aspectRatio": 1.7778
+      },
+      "author": {
+        "id": "author-style-01",
+        "username": "studio.cut",
+        "displayName": "Studio Cut",
+        "avatarUrl": "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=256&q=80",
+        "isVerified": false
+      },
+      "track": {
+        "id": "track-style-01",
+        "title": "Studio cut",
+        "artist": "Fabric Lab",
+        "coverImageUrl": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "Counts and copy are unique here so like state is easy to verify on later pages too.",
+        "footnote": "Mock pagination page 3"
+      },
+      "metrics": {
+        "likeCount": 193700,
+        "commentCount": 688,
+        "bookmarkCount": 9700,
+        "shareCount": 3900
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#6D4A4B", "#482C2D", "#251516", "#0C0909"],
+        "glowColor": "#44FF9FA3"
+      }
+    },
+    {
+      "id": "night-01",
+      "title": "Blue hour",
+      "video": {
+        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+        "thumbnailUrl": "assets/posters/feed/night-01.jpg",
+        "durationMs": 22800,
+        "aspectRatio": 2.397
+      },
+      "author": {
+        "id": "author-night-01",
+        "username": "after.hours",
+        "displayName": "After Hours",
+        "avatarUrl": "https://images.unsplash.com/photo-1546961329-78bef0414d7c?auto=format&fit=crop&w=256&q=80",
+        "isVerified": true
+      },
+      "track": {
+        "id": "track-night-01",
+        "title": "After hours",
+        "artist": "Blue Hour",
+        "coverImageUrl": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=256&q=80"
+      },
+      "caption": {
+        "text": "After this page the repository returns empty, so the feed naturally stops extending.",
+        "footnote": "Mock pagination page 3"
+      },
+      "metrics": {
+        "likeCount": 355900,
+        "commentCount": 1491,
+        "bookmarkCount": 14300,
+        "shareCount": 6800
+      },
+      "interaction": {
+        "isLiked": false,
+        "isBookmarked": false
+      },
+      "visual": {
+        "sceneColors": ["#355574", "#23384C", "#13202C", "#081018"],
+        "glowColor": "#4484D5FF"
+      }
+    }
+  ]
+}

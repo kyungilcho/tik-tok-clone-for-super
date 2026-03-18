@@ -31,26 +31,18 @@ class _AppShellState extends State<AppShell> {
           ),
           FeaturePlaceholder(
             title: 'Friends',
-            description:
-                'Friends branch placeholder. Social graph surfaces can be mounted here later.',
             bottomPadding: bottomNavigationHeight,
           ),
           FeaturePlaceholder(
             title: 'Create',
-            description:
-                'Create branch placeholder. Camera and creation flows can be mounted here later.',
             bottomPadding: bottomNavigationHeight,
           ),
           FeaturePlaceholder(
             title: 'Inbox',
-            description:
-                'Inbox branch placeholder. Notifications and direct messages can be mounted here later.',
             bottomPadding: bottomNavigationHeight,
           ),
           FeaturePlaceholder(
             title: 'Profile',
-            description:
-                'Profile branch placeholder. Account surfaces can be mounted here later.',
             bottomPadding: bottomNavigationHeight,
           ),
         ],
