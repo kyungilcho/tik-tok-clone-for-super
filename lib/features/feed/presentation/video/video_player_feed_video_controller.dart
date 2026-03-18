@@ -62,6 +62,9 @@ class VideoPlayerFeedVideoController implements FeedVideoController {
   Future<void> play() => _controller.play();
 
   @override
+  Future<void> seekTo(Duration position) => _controller.seekTo(position);
+
+  @override
   Future<void> dispose() async {
     _controller.removeListener(_syncState);
     _state.dispose();
@@ -76,6 +79,8 @@ class VideoPlayerFeedVideoController implements FeedVideoController {
       hasError: value.hasError,
       errorDescription: value.errorDescription,
       videoSize: value.size,
+      position: value.position,
+      duration: value.duration,
     );
   }
 }

@@ -33,6 +33,7 @@ class FakeFeedVideoController implements FeedVideoController {
       isInitialized: true,
       isBuffering: false,
       videoSize: Size(1080, 1920),
+      duration: Duration(seconds: 14),
     );
   }
 
@@ -41,6 +42,9 @@ class FakeFeedVideoController implements FeedVideoController {
 
   @override
   Future<void> play() async {}
+
+  @override
+  Future<void> seekTo(Duration position) async {}
 }
 
 class FakeFeedRepository implements FeedRepository {

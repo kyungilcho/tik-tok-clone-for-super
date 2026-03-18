@@ -9,6 +9,8 @@ class FeedVideoState {
     this.hasError = false,
     this.errorDescription,
     this.videoSize = Size.zero,
+    this.position = Duration.zero,
+    this.duration = Duration.zero,
   });
 
   final bool isInitialized;
@@ -16,6 +18,8 @@ class FeedVideoState {
   final bool hasError;
   final String? errorDescription;
   final Size videoSize;
+  final Duration position;
+  final Duration duration;
 }
 
 abstract class FeedVideoController {
@@ -28,6 +32,8 @@ abstract class FeedVideoController {
   Future<void> play();
 
   Future<void> pause();
+
+  Future<void> seekTo(Duration position);
 
   Future<void> dispose();
 }

@@ -44,6 +44,10 @@ class _FeedPageState extends ConsumerState<FeedPage> {
   bool _showDebugBuffering = false;
   bool _showBurstHeart = false;
   Offset? _doubleTapPosition;
+  bool _isScrubbing = false;
+  Duration _scrubPosition = Duration.zero;
+  bool _progressBarVisible = false;
+  Timer? _autoHideTimer;
 
   Timer? _debugBufferingTimer;
 
@@ -63,6 +67,9 @@ class _FeedPageState extends ConsumerState<FeedPage> {
         _isManuallyPaused = false;
         _showDebugBuffering = false;
         _debugBufferingTimer?.cancel();
+        _autoHideTimer?.cancel();
+        _progressBarVisible = false;
+        _isScrubbing = false;
       }
       unawaited(_syncPlayback());
     }
@@ -71,6 +78,7 @@ class _FeedPageState extends ConsumerState<FeedPage> {
   @override
   void dispose() {
     _debugBufferingTimer?.cancel();
+    _autoHideTimer?.cancel();
     unawaited(_videoController.dispose());
     super.dispose();
   }
@@ -146,6 +154,39 @@ class _FeedPageState extends ConsumerState<FeedPage> {
         _showDebugBuffering = false;
       });
     });
+  }
+
+  void _startAutoHideTimer() {
+    _autoHideTimer?.cancel();
+    _autoHideTimer = Timer(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() {
+        _progressBarVisible = false;
+      });
+    });
+  }
+
+  void _onScrubStart(Duration position) {
+    _autoHideTimer?.cancel();
+    setState(() {
+      _progressBarVisible = true;
+      _isScrubbing = true;
+      _scrubPosition = position;
+    });
+  }
+
+  void _onScrubUpdate(Duration position) {
+    setState(() {
+      _scrubPosition = position;
+    });
+  }
+
+  void _onScrubEnd(Duration position) {
+    unawaited(_videoController.seekTo(position));
+    setState(() {
+      _isScrubbing = false;
+    });
+    _startAutoHideTimer();
   }
 
   @override
@@ -304,7 +345,48 @@ class _FeedPageState extends ConsumerState<FeedPage> {
               left: 14,
               right: 92,
               bottom: widget.bottomNavigationHeight + 26,
-              child: _FeedMetadata(item: widget.item),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: _isScrubbing
+                    ? ValueListenableBuilder<FeedVideoState>(
+                        key: const ValueKey('scrub-timestamp'),
+                        valueListenable: _videoController.state,
+                        builder: (context, videoState, _) {
+                          return _ScrubTimestamp(
+                            position: _scrubPosition,
+                            duration: videoState.duration,
+                          );
+                        },
+                      )
+                    : _FeedMetadata(
+                        key: const ValueKey('feed-metadata'),
+                        item: widget.item,
+                      ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: widget.bottomNavigationHeight,
+              child: ValueListenableBuilder<FeedVideoState>(
+                valueListenable: _videoController.state,
+                builder: (context, videoState, _) {
+                  if (!videoState.isInitialized) {
+                    return const SizedBox.shrink();
+                  }
+                  return _VideoProgressBar(
+                    position: _isScrubbing
+                        ? _scrubPosition
+                        : videoState.position,
+                    duration: videoState.duration,
+                    isVisible: _progressBarVisible,
+                    isScrubbing: _isScrubbing,
+                    onScrubStart: _onScrubStart,
+                    onScrubUpdate: _onScrubUpdate,
+                    onScrubEnd: _onScrubEnd,
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -991,7 +1073,7 @@ class _MusicDisc extends StatelessWidget {
 }
 
 class _FeedMetadata extends StatelessWidget {
-  const _FeedMetadata({required this.item});
+  const _FeedMetadata({required this.item, super.key});
 
   final FeedItem item;
 
@@ -1060,5 +1142,196 @@ class _FeedMetadata extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _ScrubTimestamp extends StatelessWidget {
+  const _ScrubTimestamp({
+    required this.position,
+    required this.duration,
+  });
+
+  final Duration position;
+  final Duration duration;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          _formatDuration(position),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            height: 1,
+            letterSpacing: -0.5,
+            shadows: FeedPage.overlayIconShadows,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 2, left: 6, right: 6),
+          child: Text(
+            '/',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              height: 1,
+              shadows: FeedPage.overlayIconShadows,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 1),
+          child: Text(
+            _formatDuration(duration),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              height: 1,
+              shadows: FeedPage.overlayIconShadows,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+String _formatDuration(Duration d) {
+  final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+  final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+  return '$minutes:$seconds';
+}
+
+class _VideoProgressBar extends StatelessWidget {
+  const _VideoProgressBar({
+    required this.position,
+    required this.duration,
+    required this.isVisible,
+    required this.isScrubbing,
+    required this.onScrubStart,
+    required this.onScrubUpdate,
+    required this.onScrubEnd,
+  });
+
+  final Duration position;
+  final Duration duration;
+  final bool isVisible;
+  final bool isScrubbing;
+  final ValueChanged<Duration> onScrubStart;
+  final ValueChanged<Duration> onScrubUpdate;
+  final ValueChanged<Duration> onScrubEnd;
+
+  double get _progress {
+    if (duration.inMilliseconds == 0) return 0;
+    return (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
+  }
+
+  Duration _positionFromDx(double dx, double width) {
+    if (width <= 0 || duration.inMilliseconds == 0) return Duration.zero;
+    final ratio = (dx / width).clamp(0.0, 1.0);
+    return Duration(
+      milliseconds: (ratio * duration.inMilliseconds).round(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final barHeight = isScrubbing ? 4.0 : 2.0;
+    final handleSize = isScrubbing ? 14.0 : 8.0;
+    const hitAreaHeight = 40.0;
+
+    return AnimatedOpacity(
+      opacity: isVisible || isScrubbing ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 200),
+      child: SizedBox(
+        height: hitAreaHeight,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            return GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onHorizontalDragStart: (details) {
+                final pos = _positionFromDx(details.localPosition.dx, width);
+                onScrubStart(pos);
+              },
+              onHorizontalDragUpdate: (details) {
+                final pos = _positionFromDx(details.localPosition.dx, width);
+                onScrubUpdate(pos);
+              },
+              onHorizontalDragEnd: (details) {
+                onScrubEnd(position);
+              },
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 120),
+                      height: barHeight,
+                      child: CustomPaint(
+                        painter: _ProgressBarPainter(progress: _progress),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -(handleSize / 2) + (barHeight / 2),
+                    left: (_progress * width) - handleSize / 2,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 120),
+                      width: handleSize,
+                      height: handleSize,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0x55000000),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressBarPainter extends CustomPainter {
+  _ProgressBarPainter({required this.progress});
+
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bgPaint = Paint()..color = const Color(0x55FFFFFF);
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      bgPaint,
+    );
+
+    final fgPaint = Paint()..color = Colors.white;
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width * progress, size.height),
+      fgPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ProgressBarPainter oldDelegate) {
+    return oldDelegate.progress != progress;
   }
 }
