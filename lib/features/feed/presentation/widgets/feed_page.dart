@@ -44,7 +44,7 @@ class _FeedPageState extends ConsumerState<FeedPage> {
   bool _showDebugBuffering = false;
   bool _showBurstHeart = false;
   Offset? _doubleTapPosition;
-  Timer? _likeOverlayTimer;
+
   Timer? _debugBufferingTimer;
 
   @override
@@ -70,7 +70,6 @@ class _FeedPageState extends ConsumerState<FeedPage> {
 
   @override
   void dispose() {
-    _likeOverlayTimer?.cancel();
     _debugBufferingTimer?.cancel();
     unawaited(_videoController.dispose());
     super.dispose();
@@ -122,22 +121,11 @@ class _FeedPageState extends ConsumerState<FeedPage> {
   }
 
   void _handleDoubleTapLike() {
-    _likeOverlayTimer?.cancel();
-
     setState(() {
       _showBurstHeart = true;
     });
 
     ref.read(feedNotifierProvider.notifier).like(widget.item.id);
-
-    _likeOverlayTimer = Timer(const Duration(milliseconds: 900), () {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _showBurstHeart = false;
-      });
-    });
   }
 
   void _simulateDebugBuffering() {
@@ -264,7 +252,17 @@ class _FeedPageState extends ConsumerState<FeedPage> {
               Positioned(
                 left: burstHeartLeft,
                 top: burstHeartTop,
-                child: const IgnorePointer(child: _BurstHeart()),
+                child: IgnorePointer(
+                  child: _BurstHeart(
+                    key: ValueKey(_doubleTapPosition),
+                    onComplete: () {
+                      if (!mounted) return;
+                      setState(() {
+                        _showBurstHeart = false;
+                      });
+                    },
+                  ),
+                ),
               ),
             if (_isManuallyPaused) const Center(child: _PausedBadge()),
             if (widget.isLoadingMore)
@@ -290,13 +288,16 @@ class _FeedPageState extends ConsumerState<FeedPage> {
             Positioned(
               right: 12,
               bottom: widget.bottomNavigationHeight + 52,
-              child: _ActionRail(
-                item: widget.item,
-                onLikeTap: () {
-                  ref
-                      .read(feedNotifierProvider.notifier)
-                      .toggleLike(widget.item.id);
-                },
+              child: GestureDetector(
+                onDoubleTap: () {},
+                child: _ActionRail(
+                  item: widget.item,
+                  onLikeTap: () {
+                    ref
+                        .read(feedNotifierProvider.notifier)
+                        .toggleLike(widget.item.id);
+                  },
+                ),
               ),
             ),
             Positioned(
@@ -518,20 +519,104 @@ class _FeedPaginationBadge extends StatelessWidget {
   }
 }
 
-class _BurstHeart extends StatelessWidget {
-  const _BurstHeart();
+class _BurstHeart extends StatefulWidget {
+  const _BurstHeart({super.key, this.onComplete});
 
   static const double size = 112;
 
+  final VoidCallback? onComplete;
+
+  @override
+  State<_BurstHeart> createState() => _BurstHeartState();
+}
+
+class _BurstHeartState extends State<_BurstHeart>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scale;
+  late final Animation<double> _opacity;
+  late final Animation<double> _drift;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 480),
+    );
+
+    // Scale: 0 → 1.15 (overshoot) → 1.0 (settle) → 0 (shrink out)
+    _scale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.15)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 15,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.15, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 10,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 75,
+      ),
+    ]).animate(_controller);
+
+    // Opacity: hold full for first 30%, then fade out
+    _opacity = TweenSequence<double>([
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 30),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 70,
+      ),
+    ]).animate(_controller);
+
+    // Drift upward by 40px
+    _drift = Tween<double>(begin: 0, end: -120)
+        .chain(CurveTween(curve: Curves.easeOut))
+        .animate(_controller);
+
+    _controller.forward();
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        widget.onComplete?.call();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        boxShadow: [
-          BoxShadow(color: Color(0x55FF2D55), blurRadius: 26, spreadRadius: 2),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _drift.value),
+          child: Opacity(
+            opacity: _opacity.value,
+            child: Transform.scale(
+              scale: _scale.value,
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: const Icon(
+        Icons.favorite,
+        size: _BurstHeart.size,
+        color: Color(0xFFFF2D55),
+        shadows: [
+          Shadow(color: Color(0x55FF2D55), blurRadius: 24),
         ],
       ),
-      child: const Icon(Icons.favorite, size: size, color: Color(0xFFFF4B73)),
     );
   }
 }
@@ -761,7 +846,7 @@ class _AvatarAction extends StatelessWidget {
   }
 }
 
-class _ActionButton extends StatelessWidget {
+class _ActionButton extends StatefulWidget {
   const _ActionButton({
     required this.icon,
     required this.count,
@@ -775,22 +860,37 @@ class _ActionButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_ActionButton> createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<_ActionButton> {
+  Offset? _downPosition;
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Listener(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onPointerDown: (e) => _downPosition = e.localPosition,
+      onPointerUp: (e) {
+        if (_downPosition != null &&
+            (e.localPosition - _downPosition!).distance < 20) {
+          widget.onTap();
+        }
+        _downPosition = null;
+      },
+      onPointerCancel: (_) => _downPosition = null,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            icon,
-            color: color,
+            widget.icon,
+            color: widget.color,
             size: 32,
             shadows: FeedPage.overlayIconShadows,
           ),
           const SizedBox(height: 4),
           Text(
-            _formatSocialCount(count),
+            _formatSocialCount(widget.count),
             style: const TextStyle(
               color: Color(0xF0FFFFFF),
               fontSize: 12,
