@@ -9,6 +9,7 @@ import '../../domain/feed_item.dart';
 import '../video/feed_video_controller.dart';
 import 'feed_action_rail.dart';
 import 'feed_background.dart';
+import 'feed_interaction_shells.dart';
 import 'feed_metadata.dart';
 import 'feed_overlays.dart';
 import 'feed_page_tokens.dart';
@@ -187,6 +188,28 @@ class _FeedPageState extends ConsumerState<FeedPage> {
     _startAutoHideTimer();
   }
 
+  void _openProfilePage() {
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => FeedProfilePage(item: widget.item),
+        ),
+      ),
+    );
+  }
+
+  void _openCommentsSheet(BuildContext context) {
+    showFeedCommentsSheet(context, widget.item);
+  }
+
+  void _openShareSheet(BuildContext context) {
+    showFeedShareSheet(context, widget.item);
+  }
+
+  void _openMusicSheet(BuildContext context) {
+    showFeedMusicSheet(context, widget.item);
+  }
+
   List<Widget> _buildVideoLayers() {
     return [
       FeedSceneBackground(item: widget.item),
@@ -324,14 +347,18 @@ class _FeedPageState extends ConsumerState<FeedPage> {
         onDoubleTap: () {},
         child: FeedActionRail(
           item: widget.item,
+          onAvatarTap: _openProfilePage,
           onLikeTap: () {
             ref.read(feedNotifierProvider.notifier).toggleLike(widget.item.id);
           },
+          onCommentTap: () => _openCommentsSheet(context),
           onBookmarkTap: () {
             ref
                 .read(feedNotifierProvider.notifier)
                 .toggleBookmark(widget.item.id);
           },
+          onShareTap: () => _openShareSheet(context),
+          onMusicTap: () => _openMusicSheet(context),
         ),
       ),
     );
