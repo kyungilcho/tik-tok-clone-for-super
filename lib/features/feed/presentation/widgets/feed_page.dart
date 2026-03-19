@@ -319,6 +319,8 @@ class _FeedPageState extends ConsumerState<FeedPage> {
       right: 12,
       bottom: widget.bottomNavigationHeight + 52,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {},
         onDoubleTap: () {},
         child: FeedActionRail(
           item: widget.item,
