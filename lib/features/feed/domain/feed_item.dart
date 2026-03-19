@@ -27,6 +27,7 @@ class FeedItem {
     required this.sceneColors,
     required this.glowColor,
     this.isLiked = false,
+    this.isBookmarked = false,
   });
 
   final String id;
@@ -53,6 +54,7 @@ class FeedItem {
   final List<Color> sceneColors;
   final Color glowColor;
   final bool isLiked;
+  final bool isBookmarked;
 
   String get musicLabel =>
       trackArtist.isEmpty ? trackTitle : '$trackTitle · $trackArtist';
@@ -97,6 +99,7 @@ class FeedItem {
           .toList(),
       glowColor: _colorFromHex(visual['glowColor'] as String? ?? '#44FFFFFF'),
       isLiked: interaction['isLiked'] as bool? ?? false,
+      isBookmarked: interaction['isBookmarked'] as bool? ?? false,
     );
   }
 
@@ -125,6 +128,7 @@ class FeedItem {
     List<Color>? sceneColors,
     Color? glowColor,
     bool? isLiked,
+    bool? isBookmarked,
   }) {
     return FeedItem(
       id: id ?? this.id,
@@ -151,6 +155,7 @@ class FeedItem {
       sceneColors: sceneColors ?? this.sceneColors,
       glowColor: glowColor ?? this.glowColor,
       isLiked: isLiked ?? this.isLiked,
+      isBookmarked: isBookmarked ?? this.isBookmarked,
     );
   }
 }

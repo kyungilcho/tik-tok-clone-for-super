@@ -325,6 +325,11 @@ class _FeedPageState extends ConsumerState<FeedPage> {
           onLikeTap: () {
             ref.read(feedNotifierProvider.notifier).toggleLike(widget.item.id);
           },
+          onBookmarkTap: () {
+            ref
+                .read(feedNotifierProvider.notifier)
+                .toggleBookmark(widget.item.id);
+          },
         ),
       ),
     );

@@ -115,6 +115,10 @@ class FeedNotifier extends Notifier<FeedState> {
     state = state.copyWith(items: _toggleLikeInItems(state.items, itemId));
   }
 
+  void toggleBookmark(String itemId) {
+    state = state.copyWith(items: _toggleBookmarkInItems(state.items, itemId));
+  }
+
   List<FeedItem> _toggleLikeInItems(List<FeedItem> items, String itemId) {
     return items.map((item) {
       if (item.id != itemId) {
@@ -127,6 +131,22 @@ class FeedNotifier extends Notifier<FeedState> {
       return item.copyWith(
         isLiked: nextLiked,
         likeCount: item.likeCount + likeDelta,
+      );
+    }).toList();
+  }
+
+  List<FeedItem> _toggleBookmarkInItems(List<FeedItem> items, String itemId) {
+    return items.map((item) {
+      if (item.id != itemId) {
+        return item;
+      }
+
+      final nextBookmarked = !item.isBookmarked;
+      final bookmarkDelta = nextBookmarked ? 1 : -1;
+
+      return item.copyWith(
+        isBookmarked: nextBookmarked,
+        bookmarkCount: item.bookmarkCount + bookmarkDelta,
       );
     }).toList();
   }
