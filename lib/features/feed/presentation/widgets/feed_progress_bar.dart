@@ -102,6 +102,7 @@ class FeedVideoProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final barHeight = isScrubbing ? 4.0 : 2.0;
     final handleSize = isScrubbing ? 14.0 : 8.0;
+    final handleOverflow = (handleSize - barHeight) / 2;
     const hitAreaHeight = 40.0;
 
     return AnimatedOpacity(
@@ -132,12 +133,13 @@ class FeedVideoProgressBar extends StatelessWidget {
                 onScrubEnd(position);
               },
               child: Stack(
+                clipBehavior: Clip.none,
                 alignment: Alignment.centerLeft,
                 children: [
                   Positioned(
                     left: 0,
                     right: 0,
-                    bottom: 0,
+                    bottom: handleOverflow,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 120),
                       height: barHeight,
@@ -147,7 +149,7 @@ class FeedVideoProgressBar extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    bottom: -(handleSize / 2) + (barHeight / 2),
+                    bottom: 0,
                     left: (_progress * width) - handleSize / 2,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 120),
