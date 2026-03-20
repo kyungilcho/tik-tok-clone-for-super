@@ -3,11 +3,11 @@
 TikTok 스타일의 숏폼 영상 피드를 Flutter로 구현한 프로젝트입니다.
 세로 스와이프 피드, 현재 페이지 자동 재생, off-screen pause, 오버레이 UI, 좋아요/북마크 인터랙션, drag-to-seek progress bar, mock pagination까지 포함하고 있습니다.
 
-이 저장소는 Flutter 클라이언트 과제 구현을 위해 만들었지만, README는 과제 답안지보다 일반적인 프로젝트 문서에 가깝게 정리했습니다.
+README는 과제 답안보다 일반적인 프로젝트 문서에 가깝게 정리했습니다.
 
 ## Overview
 
-이 앱은 `For You` 스타일의 세로 영상 피드를 중심으로 구성되어 있습니다.
+이 앱은 세로 영상 피드를 중심으로 구성되어 있습니다.
 
 - `PageView.builder` 기반 vertical feed
 - 현재 페이지 autoplay
@@ -454,7 +454,9 @@ feed는 mock pagination 구조를 사용합니다.
 
 가장 어려웠던 부분은 `PageView 기반 feed에서 video lifecycle을 안정적으로 관리하는 것`이었습니다.
 
-구현 중에는 다음 조건을 동시에 만족해야 했습니다.
+#### 문제 상황
+
+구현 중에는 아래 조건을 동시에 만족해야 했습니다.
 
 - 현재 페이지만 autoplay
 - 화면을 벗어나면 pause
@@ -462,6 +464,18 @@ feed는 mock pagination 구조를 사용합니다.
 - buffering / error / pause UI가 같은 레이아웃 위에서 안정적으로 동작할 것
 
 처음에는 재생 관련 로직이 화면 쪽 state에 많이 섞여 있었는데, 그렇게 두면 page index, like 상태, pagination, player lifecycle이 한 군데에 모이면서 빠르게 복잡해졌습니다.
+
+#### 시도한 해결 방법
+
+처음에는 화면 단에서 재생 상태와 feed 상태를 함께 다루는 방식으로 접근했습니다. 하지만 이 구조에서는 다음 문제가 있었습니다.
+
+- page index 변경과 player 상태 변화가 서로 강하게 엮임
+- like / bookmark / pagination 같은 feed 상태와 재생 상태가 한 파일에 모임
+- buffering / error / pause UI가 늘어날수록 화면 로직이 빠르게 비대해짐
+
+이후 presentation 위젯을 분리하고, 상태를 feature 범위와 page 범위로 나누는 방향으로 구조를 재정리했습니다.
+
+#### 최종 해결 방법
 
 최종적으로는 다음처럼 역할을 나눠 해결했습니다.
 
@@ -476,6 +490,8 @@ feed는 mock pagination 구조를 사용합니다.
   - page 단위 interaction state
 - `FeedVideoController`
   - `video_player` adapter
+
+이렇게 나눈 뒤에는 active page 여부에 따라 재생과 정지를 명확하게 제어할 수 있었고, feed 상태와 player lifecycle이 서로 덜 얽히게 되었습니다.
 
 이후에는 액션 레일을 별도 위젯으로 다시 분리하고, 댓글/공유/음악 버튼은 실제 기능 대신 shell UI를 먼저 붙여서 흐름을 보이도록 정리했습니다.
 
