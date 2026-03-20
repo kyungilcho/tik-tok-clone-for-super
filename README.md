@@ -519,4 +519,6 @@ AI는 주로 구현 속도를 높이기 위한 pair-programming 보조 도구로
 - 사용 도구
   - Codex / ChatGPT 계열 코드 에이전트
 - 제출 방식
-  - 별도 스크린샷 또는 대화 로그 첨부 예정
+  - 저장소에 포함한 대화 로그 문서 첨부
+
+[AI_CONVERSATION_LOG.md](AI_CONVERSATION_LOG.md)
