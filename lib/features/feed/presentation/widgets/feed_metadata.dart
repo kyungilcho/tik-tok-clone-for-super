@@ -26,7 +26,7 @@ class FeedMetadata extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                item.title,
+                '@${item.authorUsername}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
