@@ -3,29 +3,29 @@
   "items": [
     {
       "id": "city-01",
-      "title": "Neon street run",
+      "title": "Roman: Teamwork",
       "video": {
-        "url": "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-        "thumbnailUrl": "assets/posters/feed/city-01.jpg",
+        "url": "https://svs.gsfc.nasa.gov/vis/a010000/a014800/a014891/14891_Roman_FarAndWide_4_Teamwork_Social_Vert.mp4",
+        "thumbnailUrl": "https://svs.gsfc.nasa.gov/vis/a010000/a014800/a014891/FarAndWide_Video4Teamwork_Vert_Still.jpg",
         "durationMs": 14600,
-        "aspectRatio": 1.7778
+        "aspectRatio": 0.5625
       },
       "author": {
-        "id": "author-city-01",
-        "username": "night.drive",
-        "displayName": "Night Drive",
+        "id": "author-roman-04",
+        "username": "roman.teamwork",
+        "displayName": "Roman Teamwork",
         "avatarUrl": "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=256&q=80",
         "isVerified": true
       },
       "track": {
-        "id": "track-city-01",
-        "title": "Midnight drive",
-        "artist": "After Hours",
+        "id": "track-roman-04",
+        "title": "Far and Wide Pt. 4",
+        "artist": "Roman Mission",
         "coverImageUrl": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=256&q=80"
       },
       "caption": {
-        "text": "Second page starts only when you reach the end of the first mock set.",
-        "footnote": "Mock pagination page 2"
+        "text": "Page 2 starts with another vertical social cut so the feed does not fall back to wide-only too early.",
+        "footnote": "#RomanTelescope #NASA  See original"
       },
       "metrics": {
         "likeCount": 418500,
