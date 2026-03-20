@@ -293,7 +293,7 @@ feed는 mock pagination 구조를 사용합니다.
 
 ### Demo Video
 
-[Simulator Screen Recording - iPhone 17 - 2026-03-20 at 10.51.07.mp4](Simulator%20Screen%20Recording%20-%20iPhone%2017%20-%202026-03-20%20at%2010.51.07.mp4)
+[Simulator Screen Recording - iPhone 17 - 2026-03-20 at 14.11.51.mp4](Simulator%20Screen%20Recording%20-%20iPhone%2017%20-%202026-03-20%20at%2014.11.51.mp4)
 
 ### Q1. 앱 구조 설계
 
