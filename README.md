@@ -291,6 +291,10 @@ feed는 mock pagination 구조를 사용합니다.
 
 아래 내용은 과제 제출 요구사항에 맞춰 별도로 정리한 항목입니다.
 
+### Demo Video
+
+[Simulator Screen Recording - iPhone 17 - 2026-03-20 at 10.51.07.mp4](Simulator%20Screen%20Recording%20-%20iPhone%2017%20-%202026-03-20%20at%2010.51.07.mp4)
+
 ### Q1. 앱 구조 설계
 
 #### 폴더 구조 설계 이유
